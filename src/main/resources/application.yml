@@ -1,0 +1,8 @@
+#application.yml 에는 모든 환경설정에서 공통적으로 사용하는 변수값을 선언
+spring:
+  profiles:
+    active: dev
+
+lombok:
+  log:
+    enabled: true

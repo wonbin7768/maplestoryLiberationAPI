@@ -1,0 +1,19 @@
+#개발환경 환경설정
+server:
+  port: 7070
+spring:
+  thymelaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb
+    username:
+    password:
+jpa:
+  hibernate:
+    ddl-auto: update
+  show-sql: true
+  database-platform: org.hibernate.dialect.H2Dialect
