@@ -1,4 +1,4 @@
-package com.openapi.maplestory.liberation.domain.dto;
+package com.openapi.maplestory.liberation.domain.dto.stat;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class CharacterHyperStatVo {
+public class HyperStatVo {
 
     private String character_class;
     private String use_preset_no;

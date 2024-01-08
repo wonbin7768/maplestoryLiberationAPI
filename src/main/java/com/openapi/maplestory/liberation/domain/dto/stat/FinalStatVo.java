@@ -1,4 +1,4 @@
-package com.openapi.maplestory.liberation.domain.dto;
+package com.openapi.maplestory.liberation.domain.dto.stat;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -10,6 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,7 +22,7 @@ public class MapleController {
     private final MapleService mapleService;
 
     @GetMapping("/getOcid")
-    public MapleResponseVo getOcid(@RequestParam(value = "name") String name) {
+    public Mono<List<MapleResponseVo>> getOcid(@RequestParam(value = "name") String name) {
 
         /**
          * MapleRequestVo 정의
@@ -50,12 +53,21 @@ public class MapleController {
         return getStatus(mapleRequestVo);
     }
     @GetMapping("/getStatus")
-    public MapleResponseVo getStatus(MapleRequestVo mapleRequestVo){
+    public Mono<List<MapleResponseVo>> getStatus(MapleRequestVo mapleRequestVo){
         mapleRequestVo.setDate(DateUtil.getDate());
         mapleRequestVo.setApiUrl("/v1/character/stat?ocid={mapleRequestVo.getOcid()}&date={mapleRequestVo.getDate()}");
         mapleRequestVo.setApiUrl("/v1/character/hyper-stat?ocid={mapleRequestVo.getOcid()}&date={mapleRequestVo.getDate()}");
+        mapleRequestVo.setApiUrl("/v1/character/item-equipment?ocid={mapleRequestVo.getOcid()}&date={mapleRequestVo.getDate()}");
+        mapleRequestVo.setApiUrl("/v1/character/ability?ocid={mapleRequestVo.getOcid()}&date={mapleRequestVo.getDate()}");
+        mapleRequestVo.setApiUrl("/v1/character/cashitem-equipment?ocid={mapleRequestVo.getOcid()}&date={mapleRequestVo.getDate()}");
+        mapleRequestVo.setApiUrl("/v1/character/symbol-equipment?ocid={mapleRequestVo.getOcid()}&date={mapleRequestVo.getDate()}");
+        mapleRequestVo.setApiUrl("/v1/character/set-effect?ocid={mapleRequestVo.getOcid()}&date={mapleRequestVo.getDate()}");
+        mapleRequestVo.setApiUrl("/v1/character/pet-equipment?ocid={mapleRequestVo.getOcid()}&date={mapleRequestVo.getDate()}");
+        mapleRequestVo.setApiUrl("/v1/character/skill?ocid={mapleRequestVo.getOcid()}&date={mapleRequestVo.getDate()}&character_skill_grade=0");
+        mapleRequestVo.setApiUrl("/v1/character/hexamatrix-stat?ocid={mapleRequestVo.getOcid()}&date={mapleRequestVo.getDate()}");
+        mapleRequestVo.setApiUrl("/v1/user/union-raider?ocid={mapleRequestVo.getOcid()}&date={mapleRequestVo.getDate()}");
 
-        return mapleService.getAll(mapleRequestVo).block();
+        return mapleService.getAll(mapleRequestVo);
     }
 
 

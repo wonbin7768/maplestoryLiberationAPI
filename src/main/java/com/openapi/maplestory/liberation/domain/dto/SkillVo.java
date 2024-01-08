@@ -7,9 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class HyperStatDetailVo {
-    private String stat_type;
-    private int stat_point;
-    private int stat_level;
-    private String stat_increase;
+public class SkillVo {
+    private String skill_name;
+    private int skill_level;
+    private String skill_effect;
 }
