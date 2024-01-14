@@ -5,14 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class ItemEquipmentVo {
-
     private String item_equipment_part;
     private String equipment_slot;
     private String item_name;
@@ -34,11 +30,4 @@ public class ItemEquipmentVo {
     private String starforce;
     private String starforce_scroll_flag;
     private String special_ring_level;
-    @JsonProperty("dragon_equipment")
-    private List<DragonEquipmentVo> dragonEquipmentVo = new ArrayList<>();
-    @JsonProperty("mechanic_equipment")
-    private List<MechanicEquipmentVo> mechanicEquipmentVo = new ArrayList<>();
-
-
-
 }

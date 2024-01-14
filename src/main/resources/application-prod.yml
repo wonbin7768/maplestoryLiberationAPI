@@ -1,6 +1,6 @@
 #thymleaf
 spring:
-  thymelaf:
+  thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
     mode: HTML

@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,5 +11,4 @@ public class PetEquipmentVo {
     private PetEquipmentDetailVo pet_1_equipment;
     private PetEquipmentDetailVo pet_2_equipment;
     private PetEquipmentDetailVo pet_3_equipment;
-
 }

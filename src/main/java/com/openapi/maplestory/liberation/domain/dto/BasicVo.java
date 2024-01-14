@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class MapleResponseVo {
-    private String ocid;
-    private String date;
+public class BasicVo {
+    private String character_class;
+    private int character_level;
 }

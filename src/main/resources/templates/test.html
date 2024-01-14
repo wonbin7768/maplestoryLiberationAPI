@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>메이플스토리 요청 세부 정보</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style>
+        table {
+            font-family: Arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<h1>메이플스토리 요청 세부 정보</h1>
+<p>basic: <span th:text="${basic}"></span></p>
+<p>stat: <span th:text="${stat}"></span></p>
+<p>hyper: <span th:text="${hyper}"></span></p>
+<p>item: <span th:text="${item}"></span></p>
+<!--<tr th:each = "mapleResponseVo : {mapleResponseVo}">-->
+<!--    <td th:text = "${mapleResponseVo.}"></td>-->
+<!--</tr>-->
+<!-- 필요에 따라 더 많은 속성을 추가하세요 -->
+<table>
+    <tr>
+        <th>Character</th>
+        <th>Class</th>
+        <th>Level</th>
+        <th>Abilities</th>
+    </tr>
+<!--    <tr th:each="character : ${characters}">-->
+<!--        <td th:text="${character.name}"></td>-->
+<!--        <td th:text="${character.characterClass}"></td>-->
+<!--        <td th:text="${character.level}"></td>-->
+<!--        <td>-->
+<!--            <ul th:if="${character.abilities}">-->
+<!--                <li th:each="ability : ${character.abilities}" th:text="${ability}"></li>-->
+<!--            </ul>-->
+<!--            <span th:unless="${character.abilities}">None</span>-->
+<!--        </td>-->
+<!--    </tr>-->
+</table>
+</body>
+</html>
