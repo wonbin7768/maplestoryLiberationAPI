@@ -7,12 +7,15 @@ import com.openapi.maplestory.liberation.domain.dto.equipment.ItemVo;
 import com.openapi.maplestory.liberation.domain.dto.equipment.SymbolEquipmentVo;
 import com.openapi.maplestory.liberation.domain.dto.equipment.SymbolVo;
 import com.openapi.maplestory.liberation.domain.dto.equipment.cash.CashItemEquipmentVo;
-import com.openapi.maplestory.liberation.domain.dto.equipment.pet.PetEquipmentVo;
+import com.openapi.maplestory.liberation.domain.dto.equipment.cash.CashItemOptionVo;
+import com.openapi.maplestory.liberation.domain.dto.equipment.cash.CashItemPresetVo;
 import com.openapi.maplestory.liberation.domain.dto.equipment.seteffect.SetVo;
 import com.openapi.maplestory.liberation.domain.dto.stat.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -83,15 +86,48 @@ public class CalculateService {
 
         return zipUnAppliedStat;
     }
-    public List<Integer> calAppliedStat(BasicVo basic, StatVo stat, ItemVo itemVo, CashItemEquipmentVo cashItemEquipmentVo, PetEquipmentVo petEquipmentVo, AbilityVo abilityVo, SetVo setVo, CharacterSkillVo skillVo){
+    public List<Integer> calAppliedStat(BasicVo basic, StatVo stat, ItemVo itemVo, CashItemEquipmentVo cashItemEquipmentVo,  AbilityVo abilityVo, SetVo setVo, CharacterSkillVo skillVo,String date) throws ParseException {
         List<Integer> zipAppliedStat = new ArrayList<>();
         //일단 주스탯 순수 스탯구하기
         int level = basic.getCharacter_level();
         String characterClass = basic.getCharacter_class();
         int pureStat = level * 5 + 18;
         System.out.println("pureStat = " + pureStat);
-
-
+        //캐시장비
+        //int presetNo = cashItemEquipmentVo.getPreset_no();
+        int presetNo = 2;
+        List<CashItemPresetVo> cashItemEquipmentPreset;
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        Date nowDate1 = format.parse(date);
+        Date cashDate;
+        if(presetNo == 1){
+            cashItemEquipmentPreset = cashItemEquipmentVo.getCash_item_equipment_preset_1();
+            cashDate = format.parse(cashItemEquipmentVo.getCash_item_equipment_preset_1().get(0).getDate_option_expire());
+        }else if(presetNo == 2){
+            cashItemEquipmentPreset = cashItemEquipmentVo.getCash_item_equipment_preset_2();
+            cashDate = format.parse(cashItemEquipmentVo.getCash_item_equipment_preset_2().get(0).getDate_option_expire());
+        }else{
+            cashItemEquipmentPreset = cashItemEquipmentVo.getCash_item_equipment_preset_3();
+            cashDate = format.parse(cashItemEquipmentVo.getCash_item_equipment_preset_3().get(0).getDate_option_expire());
+        }
+        int cashItemLuk = 0;
+        for (CashItemPresetVo cashItemPresetVo : cashItemEquipmentPreset) {
+            System.out.println("cashItemPresetVo = " + cashItemPresetVo.getCashItemOptionVo());
+             if (nowDate1.before(cashDate)) {
+                 List<CashItemOptionVo> cashItemOptionVo = cashItemPresetVo.getCashItemOptionVo();
+                 for (CashItemOptionVo itemOptionVo : cashItemOptionVo) {
+                     String optionType = itemOptionVo.getOption_type();
+                     int optionValue = Integer.parseInt(itemOptionVo.getOption_value());
+                     if(Objects.equals(optionType,"LUK")){
+                         cashItemLuk += optionValue;
+                     }
+                 }
+                 System.out.println("캐시장비 유효기간 안지남");
+            } else {
+                System.out.println("지남");
+            }
+        }
+        System.out.println("cashItemLuk = " + cashItemLuk);
 
         return zipAppliedStat;
     }

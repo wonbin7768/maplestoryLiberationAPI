@@ -23,6 +23,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.text.ParseException;
 import java.util.List;
 
 @Controller
@@ -34,7 +35,7 @@ public class MapleController {
     private final CalculateService calculateService;
 
     @GetMapping("/getMapleInfo")
-    public String getMapleInfo(@RequestParam(value = "name") String name, Model model) {
+    public String getMapleInfo(@RequestParam(value = "name") String name, Model model) throws ParseException {
 
         MapleRequestVo mapleRequestVo = new MapleRequestVo();
         mapleRequestVo.setApikey("test_20d5892d17fbffcdbb4b6c8d34a5943124807b95b4f783779eea66850ce570b207887955e11ecb37b3264b7471d00004");
@@ -89,7 +90,7 @@ public class MapleController {
         List<Integer> zipUnappliedStat = calculateService.calUnAppliedStat(hyperStatVo, symbolVo, unionStatVo,hexaStatVo);
         Integer unAppliedMainStat = zipUnappliedStat.get(0);
         Integer unAppliedSubStat = zipUnappliedStat.get(1);
-        calculateService.calAppliedStat(basic,stat,itemVo,cashItemEquipmentVo,petEquipmentVo,abilityVo,setVo,skillVo);
+        calculateService.calAppliedStat(basic,stat,itemVo,cashItemEquipmentVo,abilityVo,setVo,skillVo,mapleRequestVo.getDate());
 
 
         model.addAttribute("basic",basic);
