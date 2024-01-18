@@ -23,6 +23,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 @Slf4j
@@ -84,7 +86,11 @@ public class MapleController {
         UnionStatVo unionStatVo = mapleService.getUnionVo(mapleRequestVo);
         System.out.println("unionStatVo = " + unionStatVo);
 
-        calculateService.calStat(basic,stat,itemVo,cashItemEquipmentVo,petEquipmentVo,hyperStatVo,abilityVo,symbolVo,setVo,skillVo,hexaStatVo,unionStatVo);
+        List<Integer> zipUnappliedStat = calculateService.calUnAppliedStat(hyperStatVo, symbolVo, unionStatVo,hexaStatVo);
+        Integer unAppliedMainStat = zipUnappliedStat.get(0);
+        Integer unAppliedSubStat = zipUnappliedStat.get(1);
+        calculateService.calAppliedStat(basic,stat,itemVo,cashItemEquipmentVo,petEquipmentVo,abilityVo,setVo,skillVo);
+
 
         model.addAttribute("basic",basic);
         model.addAttribute("stat",stat);
