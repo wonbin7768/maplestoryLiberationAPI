@@ -3,12 +3,12 @@ package com.openapi.maplestory.liberation.domain.service;
 import com.openapi.maplestory.liberation.domain.dto.BasicVo;
 import com.openapi.maplestory.liberation.domain.dto.CharacterSkillVo;
 import com.openapi.maplestory.liberation.domain.dto.UnionStatVo;
-import com.openapi.maplestory.liberation.domain.dto.equipment.ItemVo;
-import com.openapi.maplestory.liberation.domain.dto.equipment.SymbolEquipmentVo;
-import com.openapi.maplestory.liberation.domain.dto.equipment.SymbolVo;
+import com.openapi.maplestory.liberation.domain.dto.equipment.*;
+import com.openapi.maplestory.liberation.domain.dto.equipment.cash.CashItemBaseVo;
 import com.openapi.maplestory.liberation.domain.dto.equipment.cash.CashItemEquipmentVo;
 import com.openapi.maplestory.liberation.domain.dto.equipment.cash.CashItemOptionVo;
-import com.openapi.maplestory.liberation.domain.dto.equipment.cash.CashItemPresetVo;
+import com.openapi.maplestory.liberation.domain.dto.equipment.seteffect.SetEffectInfoVo;
+import com.openapi.maplestory.liberation.domain.dto.equipment.seteffect.SetEffectVo;
 import com.openapi.maplestory.liberation.domain.dto.equipment.seteffect.SetVo;
 import com.openapi.maplestory.liberation.domain.dto.stat.*;
 import lombok.extern.slf4j.Slf4j;
@@ -94,27 +94,16 @@ public class CalculateService {
         int pureStat = level * 5 + 18;
         System.out.println("pureStat = " + pureStat);
         //캐시장비
-        //int presetNo = cashItemEquipmentVo.getPreset_no();
-        int presetNo = 2;
-        List<CashItemPresetVo> cashItemEquipmentPreset;
+        List<CashItemBaseVo> cashItemEquipmentBase = cashItemEquipmentVo.getCash_item_equipment_base();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         Date nowDate1 = format.parse(date);
         Date cashDate;
-        if(presetNo == 1){
-            cashItemEquipmentPreset = cashItemEquipmentVo.getCash_item_equipment_preset_1();
-            cashDate = format.parse(cashItemEquipmentVo.getCash_item_equipment_preset_1().get(0).getDate_option_expire());
-        }else if(presetNo == 2){
-            cashItemEquipmentPreset = cashItemEquipmentVo.getCash_item_equipment_preset_2();
-            cashDate = format.parse(cashItemEquipmentVo.getCash_item_equipment_preset_2().get(0).getDate_option_expire());
-        }else{
-            cashItemEquipmentPreset = cashItemEquipmentVo.getCash_item_equipment_preset_3();
-            cashDate = format.parse(cashItemEquipmentVo.getCash_item_equipment_preset_3().get(0).getDate_option_expire());
-        }
+        cashDate = format.parse(cashItemEquipmentVo.getCash_item_equipment_base().get(0).getDate_option_expire());
         int cashItemLuk = 0;
-        for (CashItemPresetVo cashItemPresetVo : cashItemEquipmentPreset) {
-            System.out.println("cashItemPresetVo = " + cashItemPresetVo.getCashItemOptionVo());
+        for (CashItemBaseVo cashItemBaseVo : cashItemEquipmentBase) {
+            System.out.println("cashItemPresetVo = " + cashItemBaseVo.getCashItemOptionVo());
              if (nowDate1.before(cashDate)) {
-                 List<CashItemOptionVo> cashItemOptionVo = cashItemPresetVo.getCashItemOptionVo();
+                 List<CashItemOptionVo> cashItemOptionVo = cashItemBaseVo.getCashItemOptionVo();
                  for (CashItemOptionVo itemOptionVo : cashItemOptionVo) {
                      String optionType = itemOptionVo.getOption_type();
                      int optionValue = Integer.parseInt(itemOptionVo.getOption_value());
@@ -122,14 +111,183 @@ public class CalculateService {
                          cashItemLuk += optionValue;
                      }
                  }
-                 System.out.println("캐시장비 유효기간 안지남");
-            } else {
-                System.out.println("지남");
             }
         }
         System.out.println("cashItemLuk = " + cashItemLuk);
+//        List<AbilityInfo> abilityInfo = abilityVo.getAbility_info();
+//        for (AbilityInfo info : abilityInfo) {
+//            System.out.println("info = " + info);
+//        }
+        List<FinalStatVo> finalStat = stat.getFinal_stat();
+        for (FinalStatVo finalStatVo : finalStat) {
+            System.out.println("finalStatVo = " + finalStatVo);
+        }
+        //셋트옵션 스탯 구하기
+        int calSetStat = 0;
+        List<SetEffectVo> setEffect = setVo.getSet_effect();
+        for (SetEffectVo setEffectVo : setEffect) {
+            System.out.println("setEffectVo = " + setEffectVo);
+            List<SetEffectInfoVo> setEffectInfoVo = setEffectVo.getSetEffectInfoVo();
+            for (SetEffectInfoVo effectInfoVo : setEffectInfoVo) {
+                String setOption = effectInfoVo.getSet_option();
+                if (setOption.contains("올스탯")) {
+                    int statIDX = setOption.indexOf("올스탯");
+                    String subStringSetOption = setOption.substring(statIDX, (statIDX+10));
+                    String deleteStr = subStringSetOption.replaceAll("[^0-9]", "");
+                    calSetStat += Integer.parseInt(deleteStr);
+                }else if(setOption.contains("LUK")){
+                    int statIDX = setOption.indexOf("LUK");
+                    String subStringSetOption = setOption.substring(statIDX, (statIDX+10));
+                    String deleteStr = subStringSetOption.replaceAll("[^0-9]", "");
+                    calSetStat += Integer.parseInt(deleteStr);
+                }
+            }
+        }
+        System.out.println("calSetStat = " + calSetStat);
+        int titleStat = 0;
+        Title title = itemVo.getTitle();
+        Date titleDate;
+        if(title.getDate_option_expire() == null){
+            String titleDescription = title.getTitle_description();
+            int statIDX = titleDescription.indexOf("올스탯");
+            String subStringSetOption = titleDescription.substring(statIDX, (statIDX+10));
+            String deleteStr = subStringSetOption.replaceAll("[^0-9]", "");
+            titleStat += Integer.parseInt(deleteStr);
+        }else{
+            titleDate = format.parse(title.getDate_option_expire());
+            if (nowDate1.before(titleDate)){
+                String titleDescription = title.getTitle_description();
+                int statIDX = titleDescription.indexOf("올스탯");
+                String subStringSetOption = titleDescription.substring(statIDX, (statIDX+10));
+                String deleteStr = subStringSetOption.replaceAll("[^0-9]", "");
+                titleStat += Integer.parseInt(deleteStr);            }
+        }
+        System.out.println("titleStat = " + titleStat);
+        int itemLUK = 0;
+        int itemDEX = 0;
+        int itemAllStat = 0;
+        int weaponLUK = 0;
+        int weaponDEX = 0;
+        int weaponAllStat = 0;
+        int percentLUK = 0;
+        int justOptionLUK = 0;
+        int percentDEX = 0;
+        int justOptionDEX = 0;
+        int percentAllStat = 0;
+        int justOptionAllStat = 0;
+
+        List<ItemEquipmentVo> itemEquipment = itemVo.getItem_equipment();
+        for (ItemEquipmentVo itemEquipmentVo : itemEquipment) {
+            ItemTotalOptionVo itemTotalOption = itemEquipmentVo.getItemTotalOption();
+            String itemEquipmentPart = itemEquipmentVo.getItem_equipment_part();
+            String potentialOption1 = itemEquipmentVo.getPotential_option_1();
+            String potentialOption2 = itemEquipmentVo.getPotential_option_2();
+            String potentialOption3 = itemEquipmentVo.getPotential_option_3();
+            String additionalPotentialOption1 = itemEquipmentVo.getAdditional_potential_option_1();
+            String additionalPotentialOption2 = itemEquipmentVo.getAdditional_potential_option_2();
+            String additionalPotentialOption3 = itemEquipmentVo.getAdditional_potential_option_3();
+            ItemExceptionalOptionVo itemExceptionalOption = itemEquipmentVo.getItem_exceptional_option();
+            String soulOption = itemEquipmentVo.getSoul_option();
+            String totLUK = itemTotalOption.getLuk();
+            String totDEX = itemTotalOption.getDex();
+            String totAllStat = itemTotalOption.getAll_stat();
+            if(!Objects.equals(itemEquipmentPart,"아대")){
+                itemLUK += Integer.parseInt(totLUK);
+                itemDEX += Integer.parseInt(totDEX);
+                itemAllStat += Integer.parseInt(totAllStat);
+
+                    percentLUK += calItemPercentOption(potentialOption1,"LUK");
+                    percentDEX += calItemPercentOption(potentialOption1,"DEX");
+                    percentAllStat += calItemPercentOption(potentialOption1,"올스탯");
+                    justOptionLUK += calItemJustStatOption(potentialOption1, "LUK");
+                    justOptionDEX += calItemJustStatOption(potentialOption1, "DEX");
+                    justOptionAllStat += calItemJustStatOption(potentialOption1, "올스탯");
+
+                    percentLUK += calItemPercentOption(potentialOption2,"LUK");
+                    percentDEX += calItemPercentOption(potentialOption2,"DEX");
+                    percentAllStat += calItemPercentOption(potentialOption2,"올스탯");
+                    justOptionLUK += calItemJustStatOption(potentialOption2, "LUK");
+                    justOptionDEX += calItemJustStatOption(potentialOption2, "DEX");
+                    justOptionAllStat += calItemJustStatOption(potentialOption2, "올스탯");
+
+                    percentLUK += calItemPercentOption(potentialOption3,"LUK");
+                    percentDEX += calItemPercentOption(potentialOption3,"DEX");
+                    percentAllStat += calItemPercentOption(potentialOption3,"올스탯");
+                    justOptionLUK += calItemJustStatOption(potentialOption3, "LUK");
+                    justOptionDEX += calItemJustStatOption(potentialOption3, "DEX");
+                    justOptionAllStat += calItemJustStatOption(potentialOption3, "올스탯");
+
+                    percentLUK += calItemPercentOption(additionalPotentialOption1,"LUK");
+                    percentDEX += calItemPercentOption(additionalPotentialOption1,"DEX");
+                    percentAllStat += calItemPercentOption(additionalPotentialOption1,"올스탯");
+                    justOptionLUK += calItemJustStatOption(additionalPotentialOption1, "LUK");
+                    justOptionDEX += calItemJustStatOption(additionalPotentialOption1, "DEX");
+                    justOptionAllStat += calItemJustStatOption(additionalPotentialOption1, "올스탯");
+
+                    percentLUK += calItemPercentOption(additionalPotentialOption2,"LUK");
+                    percentDEX += calItemPercentOption(additionalPotentialOption2,"DEX");
+                    percentAllStat += calItemPercentOption(additionalPotentialOption2,"올스탯");
+                    justOptionLUK += calItemJustStatOption(additionalPotentialOption2, "LUK");
+                    justOptionDEX += calItemJustStatOption(additionalPotentialOption2, "DEX");
+                    justOptionAllStat += calItemJustStatOption(additionalPotentialOption2, "올스탯");
+
+                    percentLUK += calItemPercentOption(additionalPotentialOption3,"LUK");
+                    percentDEX += calItemPercentOption(additionalPotentialOption3,"DEX");
+                    percentAllStat += calItemPercentOption(additionalPotentialOption3,"올스탯");
+                    justOptionLUK += calItemJustStatOption(additionalPotentialOption3, "LUK");
+                    justOptionDEX += calItemJustStatOption(additionalPotentialOption3, "DEX");
+                    justOptionAllStat += calItemJustStatOption(additionalPotentialOption3, "올스탯");
+
+
+
+            } else{
+                weaponLUK += Integer.parseInt(totLUK);
+                weaponDEX += Integer.parseInt(totDEX);
+                weaponAllStat += Integer.parseInt(totAllStat);
+            }
+
+            System.out.println("itemLUK = " + itemLUK);
+            System.out.println("itemDEX = " + itemDEX);
+            System.out.println("itemAllStat = " + itemAllStat);
+
+            System.out.println("weaponLUK = " + weaponLUK);
+            System.out.println("weaponDEX = " + weaponDEX);
+            System.out.println("weaponAllStat = " + weaponAllStat);
+
+            System.out.println("percentLUK = " + percentLUK);
+            System.out.println("percentDEX = " + percentDEX);
+            System.out.println("percentAllStat = " + percentAllStat);
+
+            System.out.println("justOptionLUK = " + justOptionLUK);
+            System.out.println("justOptionDEX = " + justOptionDEX);
+            System.out.println("justOptionAllStat = " + justOptionAllStat);
+        }
 
         return zipAppliedStat;
+    }
+    private int calItemPercentOption(String option , String stat){
+        int statPercent = 0;
+        if (option == null){
+            return statPercent;
+        }else{
+            if(option.contains("%") && option.contains(stat)){
+                String deleteStr = option.replaceAll("[^0-9]", "");
+                statPercent += Integer.parseInt(deleteStr);
+            }
+        }
+        return statPercent;
+    }
+    private int calItemJustStatOption(String option , String stat){
+        int justStat = 0;
+        if (option == null){
+            return justStat;
+        }else {
+            if(option.contains("%")&&option.contains(stat)){
+                String deleteStr = option.replaceAll("[^0-9]", "");
+                justStat += Integer.parseInt(deleteStr);
+            }
+        }
+        return justStat;
     }
     private int calUnionStat(List<String> statList,String statType){
         int calStat = 0;

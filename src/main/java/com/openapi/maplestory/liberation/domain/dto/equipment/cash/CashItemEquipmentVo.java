@@ -12,13 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CashItemEquipmentVo {
-
-    private int preset_no;
-    @JsonProperty("cash_item_equipment_preset_1")
-    private List<CashItemPresetVo> cash_item_equipment_preset_1 = new ArrayList<>();
-    @JsonProperty("cash_item_equipment_preset_2")
-    private List<CashItemPresetVo> cash_item_equipment_preset_2 = new ArrayList<>();
-    @JsonProperty("cash_item_equipment_preset_3")
-    private List<CashItemPresetVo> cash_item_equipment_preset_3 = new ArrayList<>();
-
+    @JsonProperty("cash_item_equipment_base")
+    private List<CashItemBaseVo> cash_item_equipment_base = new ArrayList<>();
 }
