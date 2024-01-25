@@ -1,9 +1,6 @@
 package com.openapi.maplestory.liberation.domain.controller;
 
-import com.openapi.maplestory.liberation.domain.dto.BasicVo;
-import com.openapi.maplestory.liberation.domain.dto.CharacterSkillVo;
-import com.openapi.maplestory.liberation.domain.dto.MapleRequestVo;
-import com.openapi.maplestory.liberation.domain.dto.UnionStatVo;
+import com.openapi.maplestory.liberation.domain.dto.*;
 import com.openapi.maplestory.liberation.domain.dto.equipment.ItemVo;
 import com.openapi.maplestory.liberation.domain.dto.equipment.SymbolVo;
 import com.openapi.maplestory.liberation.domain.dto.equipment.cash.CashItemEquipmentVo;
@@ -86,11 +83,13 @@ public class MapleController {
         mapleRequestVo.setApiUrl("/v1/user/union-raider?ocid={mapleRequestVo.getOcid()}&date={mapleRequestVo.getDate()}");
         UnionStatVo unionStatVo = mapleService.getUnionVo(mapleRequestVo);
         System.out.println("unionStatVo = " + unionStatVo);
-
+        mapleRequestVo.setApiUrl("/v1/user/union-artifact?ocid={mapleRequestVo.getOcid()}&date={mapleRequestVo.getDate()}");
+        UnionArtifactVo unionArtifactVo = mapleService.getUnionArtifactVo(mapleRequestVo);
+        System.out.println("unionArtifactVo = " + unionArtifactVo);
         List<Integer> zipUnappliedStat = calculateService.calUnAppliedStat(hyperStatVo, symbolVo, unionStatVo,hexaStatVo);
         Integer unAppliedMainStat = zipUnappliedStat.get(0);
         Integer unAppliedSubStat = zipUnappliedStat.get(1);
-        calculateService.calAppliedStat(basic,stat,itemVo,cashItemEquipmentVo,abilityVo,setVo,skillVo,mapleRequestVo.getDate());
+        calculateService.calAppliedStat(basic,stat,itemVo,cashItemEquipmentVo,abilityVo,setVo,skillVo,mapleRequestVo.getDate(),unionStatVo,unionArtifactVo);
 
 
         model.addAttribute("basic",basic);

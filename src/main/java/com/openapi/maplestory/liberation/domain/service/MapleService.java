@@ -21,18 +21,20 @@ public class MapleService {
         WebClient webClient = createWebClient(mapleRequestVo);
         MapleResponseVo mapleResponseVo = webClient
                 .get()
-                .uri(mapleRequestVo.getApiUrl(),mapleRequestVo.getName())
+                .uri(mapleRequestVo.getApiUrl(), mapleRequestVo.getName())
                 .retrieve()
                 .bodyToMono(MapleResponseVo.class)
                 .block();
         return mapleResponseVo.getOcid();
     }
+
     private WebClient createWebClient(MapleRequestVo mapleRequestVo) {
         return WebClient.builder()
                 .baseUrl(mapleRequestVo.getBaseUrl())
                 .defaultHeader("x-nxopen-api-key", mapleRequestVo.getApikey())
                 .build();
     }
+
     public BasicVo getBasic(MapleRequestVo mapleRequestVo) {
         WebClient webClient = createWebClient(mapleRequestVo);
         BasicVo basicVo = webClient
@@ -43,6 +45,7 @@ public class MapleService {
                 .block();
         return basicVo;
     }
+
     public StatVo getStat(MapleRequestVo mapleRequestVo) {
         WebClient webClient = createWebClient(mapleRequestVo);
         StatVo statVo = webClient
@@ -53,6 +56,7 @@ public class MapleService {
                 .block();
         return statVo;
     }
+
     public HyperStatVo getHyperStat(MapleRequestVo mapleRequestVo) {
         WebClient webClient = createWebClient(mapleRequestVo);
         HyperStatVo hyperStatVo = webClient
@@ -63,8 +67,10 @@ public class MapleService {
                 .block();
         return hyperStatVo;
     }
+
     public ItemVo getItem(MapleRequestVo mapleRequestVo) {
-        WebClient webClient = createWebClient(mapleRequestVo);        ItemVo itemVo = webClient
+        WebClient webClient = createWebClient(mapleRequestVo);
+        ItemVo itemVo = webClient
                 .get()
                 .uri(mapleRequestVo.getItemUrl(), mapleRequestVo.getOcid(), mapleRequestVo.getDate())
                 .retrieve()
@@ -72,8 +78,10 @@ public class MapleService {
                 .block();
         return itemVo;
     }
+
     public AbilityVo getAbilityVo(MapleRequestVo mapleRequestVo) {
-        WebClient webClient = createWebClient(mapleRequestVo);        AbilityVo abilityVo = webClient
+        WebClient webClient = createWebClient(mapleRequestVo);
+        AbilityVo abilityVo = webClient
                 .get()
                 .uri(mapleRequestVo.getAbilityUrl(), mapleRequestVo.getOcid(), mapleRequestVo.getDate())
                 .retrieve()
@@ -81,8 +89,10 @@ public class MapleService {
                 .block();
         return abilityVo;
     }
+
     public CashItemEquipmentVo getCashItemVo(MapleRequestVo mapleRequestVo) {
-        WebClient webClient = createWebClient(mapleRequestVo);        CashItemEquipmentVo cashItemEquipmentVo = webClient
+        WebClient webClient = createWebClient(mapleRequestVo);
+        CashItemEquipmentVo cashItemEquipmentVo = webClient
                 .get()
                 .uri(mapleRequestVo.getCashItemUrl(), mapleRequestVo.getOcid(), mapleRequestVo.getDate())
                 .retrieve()
@@ -90,8 +100,10 @@ public class MapleService {
                 .block();
         return cashItemEquipmentVo;
     }
+
     public SymbolVo getSymbolVo(MapleRequestVo mapleRequestVo) {
-        WebClient webClient = createWebClient(mapleRequestVo);        SymbolVo symbolVo = webClient
+        WebClient webClient = createWebClient(mapleRequestVo);
+        SymbolVo symbolVo = webClient
                 .get()
                 .uri(mapleRequestVo.getSymbolUrl(), mapleRequestVo.getOcid(), mapleRequestVo.getDate())
                 .retrieve()
@@ -99,8 +111,10 @@ public class MapleService {
                 .block();
         return symbolVo;
     }
+
     public SetVo getSetVo(MapleRequestVo mapleRequestVo) {
-        WebClient webClient = createWebClient(mapleRequestVo);        SetVo setVo = webClient
+        WebClient webClient = createWebClient(mapleRequestVo);
+        SetVo setVo = webClient
                 .get()
                 .uri(mapleRequestVo.getSetUrl(), mapleRequestVo.getOcid(), mapleRequestVo.getDate())
                 .retrieve()
@@ -108,8 +122,10 @@ public class MapleService {
                 .block();
         return setVo;
     }
+
     public PetEquipmentVo getPetVo(MapleRequestVo mapleRequestVo) {
-        WebClient webClient = createWebClient(mapleRequestVo);        PetEquipmentVo petEquipmentVo = webClient
+        WebClient webClient = createWebClient(mapleRequestVo);
+        PetEquipmentVo petEquipmentVo = webClient
                 .get()
                 .uri(mapleRequestVo.getPetUrl(), mapleRequestVo.getOcid(), mapleRequestVo.getDate())
                 .retrieve()
@@ -117,8 +133,10 @@ public class MapleService {
                 .block();
         return petEquipmentVo;
     }
+
     public CharacterSkillVo getSkillVo(MapleRequestVo mapleRequestVo) {
-        WebClient webClient = createWebClient(mapleRequestVo);        CharacterSkillVo characterSkillVo = webClient
+        WebClient webClient = createWebClient(mapleRequestVo);
+        CharacterSkillVo characterSkillVo = webClient
                 .get()
                 .uri(mapleRequestVo.getSkillUrl(), mapleRequestVo.getOcid(), mapleRequestVo.getDate())
                 .retrieve()
@@ -126,8 +144,10 @@ public class MapleService {
                 .block();
         return characterSkillVo;
     }
+
     public HexaStatVo getHexaVo(MapleRequestVo mapleRequestVo) {
-        WebClient webClient = createWebClient(mapleRequestVo);        HexaStatVo hexaStatVo = webClient
+        WebClient webClient = createWebClient(mapleRequestVo);
+        HexaStatVo hexaStatVo = webClient
                 .get()
                 .uri(mapleRequestVo.getHexaUrl(), mapleRequestVo.getOcid(), mapleRequestVo.getDate())
                 .retrieve()
@@ -135,14 +155,27 @@ public class MapleService {
                 .block();
         return hexaStatVo;
     }
+
     public UnionStatVo getUnionVo(MapleRequestVo mapleRequestVo) {
-        WebClient webClient = createWebClient(mapleRequestVo);        UnionStatVo unionStatVo = webClient
+        WebClient webClient = createWebClient(mapleRequestVo);
+        UnionStatVo unionStatVo = webClient
                 .get()
                 .uri(mapleRequestVo.getUnionUrl(), mapleRequestVo.getOcid(), mapleRequestVo.getDate())
                 .retrieve()
                 .bodyToMono(UnionStatVo.class)
                 .block();
         return unionStatVo;
+    }
+
+    public UnionArtifactVo getUnionArtifactVo(MapleRequestVo mapleRequestVo) {
+        WebClient webClient = createWebClient(mapleRequestVo);
+        UnionArtifactVo unionArtifactVo = webClient
+                .get()
+                .uri(mapleRequestVo.getUnionArtifactUrl(), mapleRequestVo.getOcid(), mapleRequestVo.getDate())
+                .retrieve()
+                .bodyToMono(UnionArtifactVo.class)
+                .block();
+        return unionArtifactVo;
     }
 
 

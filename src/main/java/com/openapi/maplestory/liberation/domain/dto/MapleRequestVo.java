@@ -23,7 +23,7 @@ public class MapleRequestVo {
     String skillUrl = "/v1/character/skill?ocid={mapleRequestVo.getOcid()}&date={mapleRequestVo.getDate()}&character_skill_grade=0";
     String hexaUrl = "/v1/character/hexamatrix-stat?ocid={mapleRequestVo.getOcid()}&date={mapleRequestVo.getDate()}";
     String unionUrl = "/v1/user/union-raider?ocid={mapleRequestVo.getOcid()}&date={mapleRequestVo.getDate()}";
-
+    String unionArtifactUrl = "/v1/user/union-artifact?ocid={mapleRequestVo.getOcid()}&date={mapleRequestVo.getDate()}";
 
 
     String baseUrl;
