@@ -6,12 +6,15 @@ import com.openapi.maplestory.liberation.domain.dto.equipment.SymbolVo;
 import com.openapi.maplestory.liberation.domain.dto.equipment.cash.CashItemEquipmentVo;
 import com.openapi.maplestory.liberation.domain.dto.equipment.pet.PetEquipmentVo;
 import com.openapi.maplestory.liberation.domain.dto.equipment.seteffect.SetVo;
+import com.openapi.maplestory.liberation.domain.dto.innerdto.AppliedDto;
+import com.openapi.maplestory.liberation.domain.dto.innerdto.InnerDto;
+import com.openapi.maplestory.liberation.domain.dto.innerdto.UnAppliedDto;
+import com.openapi.maplestory.liberation.domain.dto.innerdto.WeaponDto;
 import com.openapi.maplestory.liberation.domain.dto.stat.AbilityVo;
 import com.openapi.maplestory.liberation.domain.dto.stat.HexaStatVo;
 import com.openapi.maplestory.liberation.domain.dto.stat.HyperStatVo;
 import com.openapi.maplestory.liberation.domain.dto.stat.StatVo;
-import com.openapi.maplestory.liberation.domain.service.CalculateService;
-import com.openapi.maplestory.liberation.domain.service.MapleService;
+import com.openapi.maplestory.liberation.domain.service.*;
 import com.openapi.maplestory.liberation.util.DateUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +24,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.text.ParseException;
-import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -30,6 +32,9 @@ public class MapleController {
 
     private final MapleService mapleService;
     private final CalculateService calculateService;
+    private final JobCaseService jobCaseService;
+    private final CalWeaponService calWeaponService;
+    private final CalCombatPowerService calCombatPowerService;
 
     @GetMapping("/getMapleInfo")
     public String getMapleInfo(@RequestParam(value = "name") String name, Model model) throws ParseException {
@@ -48,11 +53,11 @@ public class MapleController {
 
         mapleRequestVo.setDate(DateUtil.getDate());
         mapleRequestVo.setApiUrl("/v1/character/basic?ocid={mapleRequestVo.getOcid()}&date={mapleRequestVo.getDate()}");
-        BasicVo basic = mapleService.getBasic(mapleRequestVo);
-        System.out.println("basic = " + basic);
+        BasicVo basicVo = mapleService.getBasic(mapleRequestVo);
+        System.out.println("basic = " + basicVo);
         mapleRequestVo.setApiUrl("/v1/character/stat?ocid={mapleRequestVo.getOcid()}&date={mapleRequestVo.getDate()}");
-        StatVo stat = mapleService.getStat(mapleRequestVo);
-        System.out.println("stat = " + stat);
+        StatVo statVo = mapleService.getStat(mapleRequestVo);
+        System.out.println("stat = " + statVo);
         mapleRequestVo.setApiUrl("/v1/character/hyper-stat?ocid={mapleRequestVo.getOcid()}&date={mapleRequestVo.getDate()}");
         HyperStatVo hyperStatVo = mapleService.getHyperStat(mapleRequestVo);
         System.out.println("hyperStatVo = " + hyperStatVo);
@@ -86,14 +91,23 @@ public class MapleController {
         mapleRequestVo.setApiUrl("/v1/user/union-artifact?ocid={mapleRequestVo.getOcid()}&date={mapleRequestVo.getDate()}");
         UnionArtifactVo unionArtifactVo = mapleService.getUnionArtifactVo(mapleRequestVo);
         System.out.println("unionArtifactVo = " + unionArtifactVo);
-        List<Integer> zipUnappliedStat = calculateService.calUnAppliedStat(hyperStatVo, symbolVo, unionStatVo,hexaStatVo);
-        Integer unAppliedMainStat = zipUnappliedStat.get(0);
-        Integer unAppliedSubStat = zipUnappliedStat.get(1);
-        calculateService.calAppliedStat(basic,stat,itemVo,cashItemEquipmentVo,abilityVo,setVo,skillVo,mapleRequestVo.getDate(),unionStatVo,unionArtifactVo);
 
+        InnerDto innerDto = jobCaseService.caseFilter(basicVo);
+        System.out.println("innerDto = " + innerDto);
+        UnAppliedDto unAppliedDto = calculateService.calUnAppliedStat(innerDto, basicVo, hyperStatVo, symbolVo, unionStatVo, hexaStatVo);
+        System.out.println("unAppliedDto = " + unAppliedDto);
+//        Integer unAppliedMainStat = zipUnappliedStat.get(0);
+//        Integer unAppliedSubStat = zipUnappliedStat.get(1);
+        AppliedDto appliedDto = calculateService.calAppliedStat(innerDto, basicVo, statVo, itemVo, cashItemEquipmentVo, abilityVo, setVo, skillVo, mapleRequestVo.getDate(), unionStatVo, unionArtifactVo);
+        System.out.println("appliedDto = " + appliedDto);
+        WeaponDto weaponDto = calWeaponService.calWeapon(innerDto, itemVo, basicVo);
+        System.out.println("weaponDto = " + weaponDto);
 
-        model.addAttribute("basic",basic);
-        model.addAttribute("stat",stat);
+        int combatPower = calCombatPowerService.calCombatPower(unAppliedDto, appliedDto , weaponDto);
+        System.out.println("combatPower = " + combatPower);
+
+        model.addAttribute("basic",basicVo);
+        model.addAttribute("stat",statVo);
         model.addAttribute("hyper",hyperStatVo);
         model.addAttribute("item",itemVo);
 

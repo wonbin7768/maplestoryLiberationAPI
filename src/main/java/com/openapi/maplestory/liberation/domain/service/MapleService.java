@@ -32,6 +32,7 @@ public class MapleService {
         return WebClient.builder()
                 .baseUrl(mapleRequestVo.getBaseUrl())
                 .defaultHeader("x-nxopen-api-key", mapleRequestVo.getApikey())
+                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(30*1024*1024))
                 .build();
     }
 

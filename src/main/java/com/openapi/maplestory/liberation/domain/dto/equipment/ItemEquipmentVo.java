@@ -30,4 +30,8 @@ public class ItemEquipmentVo {
     private String starforce;
     private String starforce_scroll_flag;
     private String special_ring_level;
+    @JsonProperty("item_add_option")
+    private ItemAddOptionVo item_add_option;
+    @JsonProperty("item_base_option")
+    private ItemBaseOptionVo item_base_option;
 }
