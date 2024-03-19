@@ -98,7 +98,7 @@ public class MapleController {
         System.out.println("unAppliedDto = " + unAppliedDto);
 //        Integer unAppliedMainStat = zipUnappliedStat.get(0);
 //        Integer unAppliedSubStat = zipUnappliedStat.get(1);
-        AppliedDto appliedDto = calculateService.calAppliedStat(innerDto, basicVo, statVo, itemVo, cashItemEquipmentVo, abilityVo, setVo, skillVo, mapleRequestVo.getDate(), unionStatVo, unionArtifactVo);
+        AppliedDto appliedDto = calculateService.calAppliedStat(innerDto, basicVo, statVo, itemVo, cashItemEquipmentVo, abilityVo, setVo, skillVo, mapleRequestVo.getDate(), unionStatVo, unionArtifactVo,petEquipmentVo);
         System.out.println("appliedDto = " + appliedDto);
         WeaponDto weaponDto = calWeaponService.calWeapon(innerDto, itemVo, basicVo);
         System.out.println("weaponDto = " + weaponDto);

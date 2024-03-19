@@ -5,6 +5,8 @@ import com.openapi.maplestory.liberation.domain.dto.equipment.*;
 import com.openapi.maplestory.liberation.domain.dto.equipment.cash.CashItemBaseVo;
 import com.openapi.maplestory.liberation.domain.dto.equipment.cash.CashItemEquipmentVo;
 import com.openapi.maplestory.liberation.domain.dto.equipment.cash.CashItemOptionVo;
+import com.openapi.maplestory.liberation.domain.dto.equipment.pet.ItemOption;
+import com.openapi.maplestory.liberation.domain.dto.equipment.pet.PetEquipmentVo;
 import com.openapi.maplestory.liberation.domain.dto.equipment.seteffect.SetEffectInfoVo;
 import com.openapi.maplestory.liberation.domain.dto.equipment.seteffect.SetEffectVo;
 import com.openapi.maplestory.liberation.domain.dto.equipment.seteffect.SetVo;
@@ -124,7 +126,7 @@ public class CalculateService {
         return unAppliedDto;
     }
 
-    public AppliedDto calAppliedStat(InnerDto innerDto, BasicVo basic, StatVo stat, ItemVo itemVo, CashItemEquipmentVo cashItemEquipmentVo, AbilityVo abilityVo, SetVo setVo, CharacterSkillVo skillVo, String date, UnionStatVo unionStatVo, UnionArtifactVo unionArtifactVo) throws ParseException {
+    public AppliedDto calAppliedStat(InnerDto innerDto, BasicVo basic, StatVo stat, ItemVo itemVo, CashItemEquipmentVo cashItemEquipmentVo, AbilityVo abilityVo, SetVo setVo, CharacterSkillVo skillVo, String date, UnionStatVo unionStatVo, UnionArtifactVo unionArtifactVo, PetEquipmentVo petEquipmentVo) throws ParseException {
         AppliedDto appliedDto = new AppliedDto();
         List<Integer> zipAppliedStat = new ArrayList<>();
         //일단 주스탯 순수 스탯구하기
@@ -225,41 +227,45 @@ public class CalculateService {
         double titleDamage = 0.0;
         Title title = itemVo.getTitle();
         Date titleDate;
-        String[] splitTitle = title.getTitle_description().split("\n");
-        System.out.println("splitTitle = " + splitTitle.toString());
-        for (String option : splitTitle) {
-            System.out.println("option = " + option);
-        }
-        if (title != null && title.getDate_option_expire() == null) {
+        if (title != null) {
+            String[] splitTitle = title.getTitle_description().split("\n");
+            System.out.println("splitTitle = " + splitTitle.toString());
             for (String option : splitTitle) {
-                if (option.contains("올스탯")) {
-                    String deleteStr = option.replaceAll("[^0-9]", "");
-                    titleStat += Integer.parseInt(deleteStr);
-                } else if (option.contains(mainPower)) {
-                    String deleteStr = option.replaceAll("[^0-9]", "");
-                    titlePower += Integer.parseInt(deleteStr);
-                } else if (option.contains("보스 몬스터 공격 시 데미지")) {
-                    String deleteStr = option.replaceAll("[^0-9]", "");
-                    titleDamage += Double.parseDouble(deleteStr);
-                }
-            }
-        } else if (title != null) {
-            titleDate = format.parse(title.getDate_option_expire());
-            if (nowDate1.before(titleDate)) {
-                for (String option : splitTitle) {
-                    if (option.contains("올스탯")) {
-                        String deleteStr = option.replaceAll("[^0-9]", "");
-                        titleStat += Integer.parseInt(deleteStr);
-                    } else if (option.contains(mainPower)) {
-                        String deleteStr = option.replaceAll("[^0-9]", "");
-                        titlePower += Integer.parseInt(deleteStr);
-                    } else if (option.contains("보스 몬스터 공격 시 데미지")) {
-                        String deleteStr = option.replaceAll("[^0-9]", "");
-                        titleDamage += Double.parseDouble(deleteStr);
+                String[] split = option.split(",");
+                for (String s : split) {
+                    System.out.println("s = " + s);
+                    if (title != null && title.getDate_option_expire() == null) {
+                        if (s.contains("올스탯")) {
+                            String deleteStr = s.replaceAll("[^0-9]", "");
+                            titleStat += Integer.parseInt(deleteStr);
+                        } else if (s.contains(mainPower)) {
+                            String deleteStr = s.replaceAll("[^0-9]", "");
+                            titlePower += Integer.parseInt(deleteStr);
+                        } else if (s.contains("보스 몬스터 공격 시 데미지")) {
+                            String deleteStr = s.replaceAll("[^0-9]", "");
+                            titleDamage += Double.parseDouble(deleteStr);
+                        }
+
+                    } else if (title != null) {
+                        String dateOptionExpire = title.getDate_option_expire();
+                        if (!dateOptionExpire.contains("expired")) {
+                            if (s.contains("올스탯")) {
+                                String deleteStr = s.replaceAll("[^0-9]", "");
+                                titleStat += Integer.parseInt(deleteStr);
+                            } else if (s.contains(mainPower)) {
+                                String deleteStr = s.replaceAll("[^0-9]", "");
+                                titlePower += Integer.parseInt(deleteStr);
+                            } else if (s.contains("보스 몬스터 공격 시 데미지")) {
+                                String deleteStr = s.replaceAll("[^0-9]", "");
+                                titleDamage += Double.parseDouble(deleteStr);
+                            }
+
+                        }
                     }
                 }
             }
         }
+
         System.out.println("titleStat = " + titleStat);
         System.out.println("titlePower = " + titlePower);
         System.out.println("titleDamage = " + titleDamage);
@@ -295,6 +301,7 @@ public class CalculateService {
                     totMainStat = Integer.parseInt(itemTotalOption.getLuk()) + Integer.parseInt(itemExceptionalOption.getLuk());
                     totSubStat = Integer.parseInt(itemTotalOption.getDex()) + Integer.parseInt(itemExceptionalOption.getDex());
                     totMainPower = Integer.parseInt(itemTotalOption.getAttack_power()) + Integer.parseInt(itemExceptionalOption.getAttack_power());
+                    System.out.println("아이템 = " + itemEquipmentVo.getItem_name() + "공격력 = " + totMainPower);
                     break;
                 case "힘덱":
                     totMainStat = Integer.parseInt(itemTotalOption.getStr()) + Integer.parseInt(itemExceptionalOption.getStr());
@@ -366,7 +373,7 @@ public class CalculateService {
                     itemDamage += Integer.parseInt(deleteStr);
                 }
             }
-            if(itemEquipmentPart.contains("아대")){
+            if (itemEquipmentPart.contains("아대")) {
                 //System.out.println(" = " + );
                 //112
             }
@@ -433,15 +440,15 @@ public class CalculateService {
             } else if (artifactName.contains("보스 몬스터 공격 시 데미지")) {
                 System.out.println("artifactNameBossDamage = " + artifactName);
                 String deleteStr = artifactName.replaceAll("[^0-9]", "");
-                unionArtifactBossDamage = Integer.parseInt(deleteStr)/100;
+                unionArtifactBossDamage = Integer.parseInt(deleteStr) / 100;
             } else if (artifactName.contains("크리티컬 데미지")) {
                 System.out.println("artifactNameCriDamage = " + artifactName);
                 String deleteStr = artifactName.replaceAll("[^0-9]", "");
-                unionArtifactCriDamage = Integer.parseInt(deleteStr)/100;
+                unionArtifactCriDamage = Integer.parseInt(deleteStr) / 100;
             } else if (artifactName.contains("데미지")) {
                 System.out.println("artifactNameDamage = " + artifactName);
                 String deleteStr = artifactName.replaceAll("[^0-9]", "");
-                unionArtifactDamage = Integer.parseInt(deleteStr)/100;
+                unionArtifactDamage = Integer.parseInt(deleteStr) / 100;
             }
         }
 
@@ -450,9 +457,27 @@ public class CalculateService {
         System.out.println("unionArtifactCriDamage = " + unionArtifactCriDamage);
         System.out.println("unionArtifactDamage = " + unionArtifactDamage);
 
+        int abilityPower = 0;
+        int abilityDamage = 0;
+        List<AbilityInfo> abilityInfo = abilityVo.getAbility_info();
+        for (AbilityInfo info : abilityInfo) {
+            System.out.println("info = " + info);
+            String abilityValue = info.getAbility_value();
+            if (abilityValue.contains(mainPower)) {
+                String deleteStr = abilityValue.replaceAll("[^0-9]", "");
+                abilityPower += Integer.parseInt(deleteStr);
+            } else if (abilityValue.contains("보스 몬스터 공격")) {
+                String deleteStr = abilityValue.replaceAll("[^0-9]", "");
+                abilityDamage += Integer.parseInt(deleteStr);
+            }
+        }
+        System.out.println("abilityPower = " + abilityPower);
+        System.out.println("abilityDamage = " + abilityDamage);
+
+        int petItemPower = getPetItemPower(petEquipmentVo, mainPower);
+        System.out.println("petItemPower = " + petItemPower);
 
         int petSetPower = 0;
-        int blessLevel = 0;
         String blessEffect = "";
         int blessPowerA = 0;
         int blessPowerB = 0;
@@ -534,15 +559,19 @@ public class CalculateService {
         System.out.println("unionArtifactStat = " + unionArtifactStat);
 
 
-        int lastMainStat = pureStat + cashItemMainStat + calSetStat + titleStat + unionAppliedMainStat + unionArtifactStat + itemMainStat + itemAllStat + justOptionMainStat + justOptionAllStat;
-        int lastSubStat = 4 + cashItemSubStat + calSetSubStat + titleStat + unionAppliedSubStat + unionArtifactStat + itemSubStat + itemAllStat + justOptionSubStat + justOptionAllStat;
-        double lastMainPower = cashItemMainPower + calSetMainPower + titlePower + unionAppliedPower + unionArtifactPower + finalBlessPower + petSetPower + itemMainPower + justOptionMainPower;
-
-        int lastPercentMainStat = percentMainStat + percentAllStat;
-        int lastPercentSubStat = percentSubStat + percentAllStat;
+        int lastMainStat = pureStat + cashItemMainStat + calSetStat + titleStat + unionAppliedMainStat + unionArtifactStat + itemMainStat + justOptionMainStat + justOptionAllStat;
+        int lastSubStat = 4 + cashItemSubStat + calSetSubStat + titleStat + unionAppliedSubStat + unionArtifactStat + itemSubStat + justOptionSubStat + justOptionAllStat;
+        double lastMainPower = 0;
+        if(petSetPower != 0){
+            lastMainPower = cashItemMainPower + calSetMainPower + titlePower + unionAppliedPower + unionArtifactPower + finalBlessPower + petSetPower + itemMainPower + justOptionMainPower + petItemPower + abilityPower;
+        } else {
+            lastMainPower = cashItemMainPower + calSetMainPower + titlePower + unionAppliedPower + unionArtifactPower + finalBlessPower + petSetPower + itemMainPower + justOptionMainPower + abilityPower;
+        }
+        int lastPercentMainStat = percentMainStat + percentAllStat + itemAllStat;
+        int lastPercentSubStat = percentSubStat + percentAllStat + itemAllStat;
         int lastPercentMainPower = percentMainPower;
 
-        double lastDamage = calSetDamage + titleDamage + unionAppliedDamage + unionArtifactDamage + unionArtifactBossDamage + itemDamage;
+        double lastDamage = calSetDamage + titleDamage + unionAppliedDamage + unionArtifactDamage + unionArtifactBossDamage + itemDamage + abilityDamage;
         double lastCriDamage = calSetCriDamage + unionAppliedCriDamage + unionArtifactCriDamage + itemCriDamage;
 
         appliedDto.setMainStat(lastMainStat);
@@ -566,6 +595,45 @@ public class CalculateService {
         System.out.println("lastCriDamage = " + lastCriDamage);
 
         return appliedDto;
+    }
+
+    private static int getPetItemPower(PetEquipmentVo petEquipmentVo, String mainPower) {
+        int petItemPower = 0;
+        System.out.println("petEquipmentVo = " + petEquipmentVo);
+        if (petEquipmentVo.getPet_1_equipment() != null) {
+            List<ItemOption> petItemOption1 = petEquipmentVo.getPet_1_equipment().getItem_option();
+            for (ItemOption itemOption : petItemOption1) {
+                String optionType = itemOption.getOption_type();
+                String optionValue = itemOption.getOption_value();
+                if (Objects.equals(optionType, mainPower)) {
+                    String deleteStr = optionValue.replaceAll("[^0-9]", "");
+                    petItemPower += Integer.parseInt(deleteStr);
+                }
+            }
+        } if (petEquipmentVo.getPet_2_equipment() != null) {
+            List<ItemOption> petItemOption2 = petEquipmentVo.getPet_2_equipment().getItem_option();
+            for (ItemOption itemOption : petItemOption2) {
+                String optionType = itemOption.getOption_type();
+                String optionValue = itemOption.getOption_value();
+                if (Objects.equals(optionType, mainPower)) {
+                    String deleteStr = optionValue.replaceAll("[^0-9]", "");
+                    petItemPower += Integer.parseInt(deleteStr);
+                }
+            }
+        } if (petEquipmentVo.getPet_3_equipment() != null) {
+            List<ItemOption> petItemOption3 = petEquipmentVo.getPet_3_equipment().getItem_option();
+            for (ItemOption itemOption : petItemOption3) {
+                String optionType = itemOption.getOption_type();
+                String optionValue = itemOption.getOption_value();
+                if (Objects.equals(optionType, mainPower)) {
+                    String deleteStr = optionValue.replaceAll("[^0-9]", "");
+                    petItemPower += Integer.parseInt(deleteStr);
+                }
+            }
+        }
+
+
+        return petItemPower;
     }
 
     private int calItemPercentOption(String option, String stat) {
@@ -642,23 +710,26 @@ public class CalculateService {
         boolean isMainStat = false;
         List<HexaStatDetailVo> hexaStatDetailVo = hexaStatVo.getHexaStatDetailVo();
         for (HexaStatDetailVo statDetailVo : hexaStatDetailVo) {
-            if (Objects.equals(statDetailVo.getMain_stat_name(), statType)) {
+            System.out.println("statDetailVo = " + statDetailVo);
+            if (Objects.equals(statDetailVo.getMain_stat_name(), statType) && statDetailVo.getMain_stat_level() != 0 ) {
                 isMainStat = true;
                 x = (statDetailVo.getMain_stat_level()) - 1;
-            } else if (Objects.equals(statDetailVo.getSub_stat_name_1(), statType)) {
+            } else if (Objects.equals(statDetailVo.getSub_stat_name_1(), statType) && statDetailVo.getSub_stat_level_1() !=0 ) {
                 isMainStat = false;
                 x = (statDetailVo.getSub_stat_level_1()) - 1;
-            } else if (Objects.equals(statDetailVo.getSub_stat_name_2(), statType)) {
+            } else if (Objects.equals(statDetailVo.getSub_stat_name_2(), statType) && statDetailVo.getSub_stat_level_2() != 0) {
                 isMainStat = false;
                 x = (statDetailVo.getSub_stat_level_2()) - 1;
             } else {
-                return 0;
+                return result;
             }
         }
-        double[] multipliers = getHexaStat(statType, isMainStat);
-        if (multipliers.length == 0) {
+        double[] multipliers = new double[0];
+        if (x < 0) {
             return result;
-        } else {
+        } else if (x > 0) {
+            System.out.println("multipliers = " + multipliers);
+            multipliers = getHexaStat(statType, isMainStat);
             result = multipliers[x];
         }
         return result;

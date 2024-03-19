@@ -43,8 +43,14 @@ public class CalWeaponService {
         int addOptionMainPower = 0;
         int baseOptionMainPower = 0;
 
+        int etcPower = 0;
+        int starForcePower = 0;
+
         String weaponName = "";
         String weaponPart = "";
+
+        int scrollUpgrade = 0;
+        int starForce = 0;
 
         List<ItemEquipmentVo> itemEquipment = itemVo.getItem_equipment();
 
@@ -61,7 +67,11 @@ public class CalWeaponService {
             for (String s : weapon) {
                 if (Objects.equals(itemEquipmentPart, s)) {
                     weaponPart = itemEquipmentPart;
-                    System.out.println("itemTotalOption weapon = " + itemTotalOption);
+                    ItemEtcOptionVo itemEtcOption = itemEquipmentVo.getItem_etc_option();
+                    ItemStarforceOptionVo itemStarforceOption = itemEquipmentVo.getItem_starforce_option();
+                    scrollUpgrade = Integer.parseInt(itemEquipmentVo.getScroll_upgrade());
+                    starForce = Integer.parseInt(itemEquipmentVo.getStarforce());
+
                     weaponName = itemName;
                     weaponDto.setWeaponName(itemName);
                     switch (jobCase) {
@@ -71,6 +81,8 @@ public class CalWeaponService {
                             totMainPower = Integer.parseInt(itemTotalOption.getAttack_power()) + Integer.parseInt(itemExceptionalOption.getAttack_power());
                             addOptionMainPower = Integer.parseInt(itemAddOption.getAttack_power());
                             baseOptionMainPower = Integer.parseInt(itemBaseOption.getAttack_power());
+                            etcPower = Integer.parseInt(itemEtcOption.getAttack_power());
+                            starForcePower = Integer.parseInt(itemStarforceOption.getAttack_power());
                             break;
                         case "힘덱":
                             totMainStat = Integer.parseInt(itemTotalOption.getStr()) + Integer.parseInt(itemExceptionalOption.getStr());
@@ -78,6 +90,8 @@ public class CalWeaponService {
                             totMainPower = Integer.parseInt(itemTotalOption.getAttack_power()) + Integer.parseInt(itemExceptionalOption.getAttack_power());
                             addOptionMainPower = Integer.parseInt(itemAddOption.getAttack_power());
                             baseOptionMainPower = Integer.parseInt(itemBaseOption.getAttack_power());
+                            etcPower = Integer.parseInt(itemEtcOption.getAttack_power());
+                            starForcePower = Integer.parseInt(itemStarforceOption.getAttack_power());
                             break;
                         case "덱힘":
                             totMainStat = Integer.parseInt(itemTotalOption.getDex()) + Integer.parseInt(itemExceptionalOption.getDex());
@@ -85,6 +99,8 @@ public class CalWeaponService {
                             totMainPower = Integer.parseInt(itemTotalOption.getAttack_power()) + Integer.parseInt(itemExceptionalOption.getAttack_power());
                             addOptionMainPower = Integer.parseInt(itemAddOption.getAttack_power());
                             baseOptionMainPower = Integer.parseInt(itemBaseOption.getAttack_power());
+                            etcPower = Integer.parseInt(itemEtcOption.getAttack_power());
+                            starForcePower = Integer.parseInt(itemStarforceOption.getAttack_power());
                             break;
                         case "인럭":
                             totMainStat = Integer.parseInt(itemTotalOption.getInt()) + Integer.parseInt(itemExceptionalOption.getInt());
@@ -92,6 +108,8 @@ public class CalWeaponService {
                             totMainPower = Integer.parseInt(itemTotalOption.getMagic_power()) + Integer.parseInt(itemExceptionalOption.getMagic_power());
                             addOptionMainPower = Integer.parseInt(itemAddOption.getMagic_power());
                             baseOptionMainPower = Integer.parseInt(itemBaseOption.getMagic_power());
+                            etcPower = Integer.parseInt(itemEtcOption.getMagic_power());
+                            starForcePower = Integer.parseInt(itemStarforceOption.getMagic_power());
                             break;
                         case "데벤제논":
                             System.out.println("데벤 제논 미구현");
@@ -154,22 +172,40 @@ public class CalWeaponService {
                 }
             }
         }
+
+        System.out.println("scrollUpgrade = " + scrollUpgrade);
+        System.out.println("starForce = " + starForce);
+        System.out.println("etcPower = " + etcPower);
+
         itemOptionDamage = itemOptionDamage - itemCriDamage;
         System.out.println("itemEquipment = " + itemEquipment);
         System.out.println("addOptionMainPower = " + addOptionMainPower);
         System.out.println("baseOptionMainPower = " + baseOptionMainPower);
         System.out.println("weaponPart = " + weaponPart);
+        int etcConstantCorrection = calWeaponEtcConstantCorrection(scrollUpgrade, starForce, etcPower, weaponName);
+        System.out.println("etcConstantCorrection = " + etcConstantCorrection);
 
         int correctionConstantBase = calWeaponBasicConstantCorrection(weaponName, baseOptionMainPower);
         System.out.println("correctionConstantBase = " + correctionConstantBase);
+
         int addGrade = calWeaponAddOptionGradeV2(weaponName, weaponPart, addOptionMainPower);
         System.out.println("addGrade = " + addGrade);
         int correctionConstantAdd = calWeaponAddConstantCorrection(weaponName, addGrade);
+        int resultEtc = 0;
+        if (starForcePower > 1 ){
+            resultEtc = etcConstantCorrection - (starForcePower + baseOptionMainPower + etcPower + correctionConstantBase);
+        }
+        System.out.println("resultEtc = " + resultEtc);
         int resultAdd = correctionConstantAdd - addOptionMainPower;
         System.out.println("correctionConstantAdd = " + correctionConstantAdd);
-        int finalPower = correctionConstantBase + resultAdd;
+        int finalPower = correctionConstantBase + resultAdd + resultEtc;
         System.out.println("resultAdd = " + resultAdd);
         System.out.println("finalPower = " + finalPower);
+        if (weaponName.contains("제네시스")){
+            weaponDto.setLiberation(true);
+        }else {
+            weaponDto.setLiberation(false);
+        }
 
         weaponDto.setDamagePercent(itemOptionDamage);
         weaponDto.setPowerPercent(percentMainPower);
@@ -439,6 +475,73 @@ public class CalWeaponService {
             }
         }
         return addCorrection;
+    }
+
+    private int calWeaponEtcConstantCorrection(int scrollUpgrade, int starForce, int etcPower, String weaponName) {
+        int scrollPower = 0;
+        int correctionEtcPower = 0;
+        if (scrollUpgrade==0){
+            scrollPower = 0;
+        }else {
+            scrollPower = etcPower / scrollUpgrade;
+        }
+        correctionEtcPower = scrollPower * scrollUpgrade;
+        int starForceChangeValue = 0;
+        int papWeaponPower = 160 + etcPower;
+        int appWeaponPower = 190 + etcPower;
+        int akeWeaponPower = 276 + etcPower;
+        int result = 0;
+        System.out.println("scrollPower = " + scrollPower);
+        System.out.println("correctionEtcPower = " + correctionEtcPower);
+        if (weaponName.contains("파프니르") && starForce > 0) {
+            int starPower = 10;
+            for (int i = 1; i <= starForce; i ++){
+                if(i < 16){
+                    starForceChangeValue = (papWeaponPower / 50) + 1;
+                    papWeaponPower += starForceChangeValue;
+                  } else if (i == 16) {
+                    papWeaponPower += 8;
+                } else if (i < 19) {
+                    papWeaponPower += 9;
+                } else if(i < 23 ){
+                    papWeaponPower += starPower;
+                    starPower++;
+                }
+            }
+            result = papWeaponPower;
+        } else if (weaponName.contains("앱솔랩스") && starForce > 0) {
+            int starPower = 10;
+            for (int i = 1; i <= starForce; i ++){
+                if(i < 16){
+                    starForceChangeValue = (appWeaponPower / 50) + 1;
+                    appWeaponPower += starForceChangeValue;
+                } else if (i < 18) {
+                    appWeaponPower += 9;
+                } else if(i < 23 ){
+                    appWeaponPower += starPower;
+                    starPower++;
+                }
+            }
+            result = appWeaponPower;
+        } else if (weaponName.contains("아케인셰이드") && starForce > 0) {
+            int starPower = 15;
+            for (int i = 1; i <= starForce; i ++){
+                if(i < 16){
+                    starForceChangeValue = (akeWeaponPower / 50) + 1;
+                    akeWeaponPower += starForceChangeValue;
+                } else if (i < 18) {
+                    akeWeaponPower += 13;
+                } else if (i < 20) {
+                    akeWeaponPower += 14;
+                } else if(i < 23 ){
+                    akeWeaponPower += starPower;
+                    starPower++;
+                }
+            }
+            result = akeWeaponPower;
+        }
+
+        return result;
     }
 
 

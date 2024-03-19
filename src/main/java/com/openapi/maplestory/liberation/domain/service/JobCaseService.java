@@ -18,7 +18,7 @@ public class JobCaseService {
                 innerDto.setWeapon("아대");
                 break;
             case "섀도어":
-            case "듀얼블레이드":
+            case "듀얼블레이더":
                 innerDto.setWeapon("단검");
                 break;
             case "팬텀":
@@ -145,7 +145,7 @@ public class JobCaseService {
             case "나이트워커":
             case "나이트로드":
             case "섀도어":
-            case "듀얼블레이드":
+            case "듀얼블레이더":
             case "팬텀":
             case "카데나":
             case "칼리":

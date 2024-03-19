@@ -37,5 +37,6 @@ public class WeaponDto {
 
     private int constantCorrection;
 
+    private boolean liberation;
 
 }

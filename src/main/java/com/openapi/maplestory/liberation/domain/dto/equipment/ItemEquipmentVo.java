@@ -28,10 +28,15 @@ public class ItemEquipmentVo {
     private String soul_name;
     private String soul_option;
     private String starforce;
+    private String scroll_upgrade;
     private String starforce_scroll_flag;
     private String special_ring_level;
     @JsonProperty("item_add_option")
     private ItemAddOptionVo item_add_option;
     @JsonProperty("item_base_option")
     private ItemBaseOptionVo item_base_option;
+    @JsonProperty("item_etc_option")
+    private ItemEtcOptionVo item_etc_option;
+    @JsonProperty("item_starforce_option")
+    private ItemStarforceOptionVo item_starforce_option;
 }
