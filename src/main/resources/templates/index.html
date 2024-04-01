@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>dd</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<script th:inline="javascript">
+    var message = /*[[${message}]]*/ '';
+    var uri = /*[[${uri}]]*/ '';
+    if(message){
+        alert(message);
+        window.location.href = uri;
+    }
+</script>
+<body>
+<h1>해방할 캐릭터 선택</h1>
+<form th:action = "@{/getMapleInfo}" method="get">
+    <input type="text" name = "name">
+    <button type="submit"> 찾기 </button>
+</form>
+</body>
+</html>

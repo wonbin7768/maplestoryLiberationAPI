@@ -1,4 +1,4 @@
-package com.openapi.maplestory.liberation.domain.service;
+package com.openapi.maplestory.liberation.service;
 
 import com.openapi.maplestory.liberation.domain.dto.*;
 import com.openapi.maplestory.liberation.domain.dto.equipment.ItemVo;
@@ -17,12 +17,17 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Service
 @Slf4j
 public class MapleService {
-    public String getOcid(MapleRequestVo mapleRequestVo) {
+    public String getOcid(MapleRequestVo mapleRequestVo){
         WebClient webClient = createWebClient(mapleRequestVo);
         MapleResponseVo mapleResponseVo = webClient
                 .get()
                 .uri(mapleRequestVo.getApiUrl(), mapleRequestVo.getName())
                 .retrieve()
+                .onStatus(status -> status.is4xxClientError()
+                                || status.is5xxServerError()
+                        , clientResponse ->
+                                clientResponse.bodyToMono(String.class)
+                                        .map(body -> new RuntimeException(body)))
                 .bodyToMono(MapleResponseVo.class)
                 .block();
         return mapleResponseVo.getOcid();

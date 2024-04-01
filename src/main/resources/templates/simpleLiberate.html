@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>메이플스토리 요청 세부 정보</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style>
+        table {
+            font-family: Arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<h1>메이플스토리 요청 세부 정보</h1>
+<p>id: <span th:text="${id}"></span></p>
+<p>전투력: <span th:text="${combatPower}"></span></p>
+<p>h2</p>
+<form th:action = "@{/liberate}" method="post">
+    <button type="submit"> 해방 </button>
+</form>
+</body>
+</html>

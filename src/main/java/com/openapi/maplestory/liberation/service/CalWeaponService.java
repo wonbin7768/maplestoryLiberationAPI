@@ -1,4 +1,4 @@
-package com.openapi.maplestory.liberation.domain.service;
+package com.openapi.maplestory.liberation.service;
 
 import com.openapi.maplestory.liberation.domain.dto.BasicVo;
 import com.openapi.maplestory.liberation.domain.dto.equipment.*;
@@ -182,6 +182,7 @@ public class CalWeaponService {
         System.out.println("addOptionMainPower = " + addOptionMainPower);
         System.out.println("baseOptionMainPower = " + baseOptionMainPower);
         System.out.println("weaponPart = " + weaponPart);
+
         int etcConstantCorrection = calWeaponEtcConstantCorrection(scrollUpgrade, starForce, etcPower, weaponName);
         System.out.println("etcConstantCorrection = " + etcConstantCorrection);
 
@@ -192,26 +193,40 @@ public class CalWeaponService {
         System.out.println("addGrade = " + addGrade);
         int correctionConstantAdd = calWeaponAddConstantCorrection(weaponName, addGrade);
         int resultEtc = 0;
-        if (starForcePower > 1 ){
-            resultEtc = etcConstantCorrection - (starForcePower + baseOptionMainPower + etcPower + correctionConstantBase);
+        if (starForcePower > 1 && !Objects.equals(weaponPart, "활")) {
+            resultEtc = etcConstantCorrection - (starForcePower + baseOptionMainPower + etcPower);
         }
         System.out.println("resultEtc = " + resultEtc);
-        int resultAdd = correctionConstantAdd - addOptionMainPower;
+        int resultAdd = 0;
+        if (!Objects.equals(weaponPart, "활")) {
+            resultAdd = correctionConstantAdd - addOptionMainPower;
+        }
         System.out.println("correctionConstantAdd = " + correctionConstantAdd);
-        int finalPower = correctionConstantBase + resultAdd + resultEtc;
+        int coPower = etcConstantCorrection + correctionConstantAdd;
+        int resultPower = 0;
+        if (!Objects.equals(weaponPart, "활")
+                && !Objects.equals(weaponPart, "듀얼 보우건")
+                && !Objects.equals(weaponPart, "에인션트 보우")
+                && !Objects.equals(weaponPart, "브레스 슈터")
+                && !Objects.equals(weaponPart, "단검")
+                && !Objects.equals(weaponPart, "체인")
+                && !Objects.equals(weaponPart, "부채")
+                && !Objects.equals(weaponPart, "차크람")) {
+            resultPower = coPower - itemMainPower;
+        }
+        System.out.println("resultPower = " + resultPower);
         System.out.println("resultAdd = " + resultAdd);
-        System.out.println("finalPower = " + finalPower);
-        if (weaponName.contains("제네시스")){
-            weaponDto.setLiberation(true);
-        }else {
-            weaponDto.setLiberation(false);
+        if (weaponName.contains("제네시스")) {
+            weaponDto.setLiberation(1.1);
+        } else {
+            weaponDto.setLiberation(1.0);
         }
 
         weaponDto.setDamagePercent(itemOptionDamage);
         weaponDto.setPowerPercent(percentMainPower);
         weaponDto.setMainStatPercent(percentMainStat);
         weaponDto.setSubStatPercent(percentSubStat);
-        weaponDto.setPowerStat(justOptionMainPower);
+        weaponDto.setJustPowerStat(justOptionMainPower);
 
         weaponDto.setJustMainStat(justOptionMainStat);
         weaponDto.setJustSubStat(justOptionSubStat);
@@ -224,7 +239,7 @@ public class CalWeaponService {
         weaponDto.setTotalSubStat(itemSubStat);
         weaponDto.setTotalDamage(itemDamage);
 
-        weaponDto.setConstantCorrection(finalPower);
+        weaponDto.setConstantCorrection(resultPower);
         weaponDto.setBonusGrade(addGrade);
 
         return weaponDto;
@@ -478,69 +493,72 @@ public class CalWeaponService {
     }
 
     private int calWeaponEtcConstantCorrection(int scrollUpgrade, int starForce, int etcPower, String weaponName) {
-        int scrollPower = 0;
-        int correctionEtcPower = 0;
-        if (scrollUpgrade==0){
-            scrollPower = 0;
-        }else {
-            scrollPower = etcPower / scrollUpgrade;
-        }
-        correctionEtcPower = scrollPower * scrollUpgrade;
         int starForceChangeValue = 0;
         int papWeaponPower = 160 + etcPower;
         int appWeaponPower = 190 + etcPower;
         int akeWeaponPower = 276 + etcPower;
         int result = 0;
-        System.out.println("scrollPower = " + scrollPower);
-        System.out.println("correctionEtcPower = " + correctionEtcPower);
-        if (weaponName.contains("파프니르") && starForce > 0) {
-            int starPower = 10;
-            for (int i = 1; i <= starForce; i ++){
-                if(i < 16){
-                    starForceChangeValue = (papWeaponPower / 50) + 1;
-                    papWeaponPower += starForceChangeValue;
-                  } else if (i == 16) {
-                    papWeaponPower += 8;
-                } else if (i < 19) {
-                    papWeaponPower += 9;
-                } else if(i < 23 ){
-                    papWeaponPower += starPower;
-                    starPower++;
-                }
+        if (starForce == 0) {
+            if (weaponName.contains("파프니르")) {
+                result = papWeaponPower;
+            } else if (weaponName.contains("앱솔랩스")) {
+                result = appWeaponPower;
+            } else if (weaponName.contains("아케인")) {
+                result = akeWeaponPower;
             }
-            result = papWeaponPower;
-        } else if (weaponName.contains("앱솔랩스") && starForce > 0) {
-            int starPower = 10;
-            for (int i = 1; i <= starForce; i ++){
-                if(i < 16){
-                    starForceChangeValue = (appWeaponPower / 50) + 1;
-                    appWeaponPower += starForceChangeValue;
-                } else if (i < 18) {
-                    appWeaponPower += 9;
-                } else if(i < 23 ){
-                    appWeaponPower += starPower;
-                    starPower++;
+        } else {
+            if (weaponName.contains("파프니르") && starForce > 0) {
+                int starPower = 10;
+                for (int i = 1; i <= starForce; i++) {
+                    if (i < 16) {
+                        starForceChangeValue = (papWeaponPower / 50) + 1;
+                        papWeaponPower += starForceChangeValue;
+                    } else if (i == 16) {
+                        papWeaponPower += 8;
+                    } else if (i < 19) {
+                        papWeaponPower += 9;
+                    } else if (i < 23) {
+                        papWeaponPower += starPower;
+                        starPower++;
+                    }
                 }
-            }
-            result = appWeaponPower;
-        } else if (weaponName.contains("아케인셰이드") && starForce > 0) {
-            int starPower = 15;
-            for (int i = 1; i <= starForce; i ++){
-                if(i < 16){
-                    starForceChangeValue = (akeWeaponPower / 50) + 1;
-                    akeWeaponPower += starForceChangeValue;
-                } else if (i < 18) {
-                    akeWeaponPower += 13;
-                } else if (i < 20) {
-                    akeWeaponPower += 14;
-                } else if(i < 23 ){
-                    akeWeaponPower += starPower;
-                    starPower++;
+                result = papWeaponPower;
+            } else if (weaponName.contains("앱솔랩스") && starForce > 0) {
+                int starPower = 10;
+                for (int i = 1; i <= starForce; i++) {
+                    System.out.println("i = " + i);
+                    if (i < 16) {
+                        starForceChangeValue = (appWeaponPower / 50) + 1;
+                        appWeaponPower += starForceChangeValue;
+                        System.out.println("starForceChangeValue = " + starForceChangeValue);
+                        System.out.println("appWeaponPower = " + appWeaponPower);
+                    } else if (i < 18) {
+                        appWeaponPower += 9;
+                        System.out.println("appWeaponPower = " + appWeaponPower);
+                    } else if (i < 23) {
+                        appWeaponPower += starPower;
+                        starPower++;
+                    }
                 }
+                result = appWeaponPower;
+            } else if (weaponName.contains("아케인셰이드") && starForce > 0) {
+                int starPower = 15;
+                for (int i = 1; i <= starForce; i++) {
+                    if (i < 16) {
+                        starForceChangeValue = (akeWeaponPower / 50) + 1;
+                        akeWeaponPower += starForceChangeValue;
+                    } else if (i < 18) {
+                        akeWeaponPower += 13;
+                    } else if (i < 20) {
+                        akeWeaponPower += 14;
+                    } else if (i < 23) {
+                        akeWeaponPower += starPower;
+                        starPower++;
+                    }
+                }
+                result = akeWeaponPower;
             }
-            result = akeWeaponPower;
         }
-
         return result;
     }
 

@@ -1,4 +1,4 @@
-package com.openapi.maplestory.liberation.domain.service;
+package com.openapi.maplestory.liberation.service;
 
 import com.openapi.maplestory.liberation.domain.dto.BasicVo;
 import com.openapi.maplestory.liberation.domain.dto.innerdto.InnerDto;
@@ -9,13 +9,14 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class JobCaseService {
 
-    public InnerDto caseFilter(BasicVo basicVo){
+    public InnerDto caseFilter(BasicVo basicVo, String name) {
         InnerDto innerDto = new InnerDto();
         String characterClass = basicVo.getCharacter_class();
         switch (characterClass) {
             case "나이트워커":
             case "나이트로드":
                 innerDto.setWeapon("아대");
+                innerDto.setEtcPower(27.0);
                 break;
             case "섀도어":
             case "듀얼블레이더":
@@ -88,10 +89,12 @@ public class JobCaseService {
             case "윈드브레이커":
             case "보우마스터":
                 innerDto.setWeapon("활");
+                innerDto.setEtcPower(9.0);
                 break;
             case "와일드헌터":
             case "신궁":
                 innerDto.setWeapon("석궁");
+                innerDto.setEtcPower(9.0);
                 break;
             case "패스파인더":
                 innerDto.setWeapon("에인션트 보우");
@@ -103,6 +106,9 @@ public class JobCaseService {
                 innerDto.setWeapon("브레스 슈터");
                 break;
             case "캡틴":
+                innerDto.setWeapon("건");
+                innerDto.setEtcPower(22);
+                break;
             case "메카닉":
                 innerDto.setWeapon("건");
                 break;
@@ -220,7 +226,7 @@ public class JobCaseService {
                 System.out.println("4차 전직 이전 캐릭터 입니다! 전직부터하세요!");
                 break;
         }
-
+        innerDto.setNickName(name);
         return innerDto;
     }
 

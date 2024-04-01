@@ -1,6 +1,8 @@
 package com.openapi.maplestory.liberation.domain.dto.innerdto;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,12 +11,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class WeaponDto {
+public class SimpleLiberateWeaponDto {
     @Id @GeneratedValue
     private int id;
 
     private String weaponName;
-    private String soulOption;
 
     private int totalMainStat;
     private int totalSubStat;

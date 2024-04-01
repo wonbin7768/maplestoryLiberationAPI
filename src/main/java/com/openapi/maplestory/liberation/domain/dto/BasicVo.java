@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class BasicVo {
     private String character_class;
     private int character_level;
+    private String character_image;
 }

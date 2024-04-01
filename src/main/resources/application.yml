@@ -6,3 +6,10 @@ spring:
 lombok:
   log:
     enabled: true
+
+server:
+  error:
+    whitelabel:
+      enabled: true
+    include-stacktrace: never
+    path: /error

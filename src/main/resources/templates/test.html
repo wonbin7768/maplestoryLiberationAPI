@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>메이플스토리 요청 세부 정보</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -18,56 +18,30 @@
             background-color: #f2f2f2;
         }
     </style>
+
 </head>
 <body>
 <h1>메이플스토리 요청 세부 정보</h1>
-<p>basic: <span th:text="${basic}"></span></p>
-<!--<p>stat: <span th:text="${stat}"></span></p>-->
-<!--<p>hyper: <span th:text="${hyper}"></span></p>-->
-<p>item: <span th:text="${item.title}"></span></p>
-
-<div th:each="equipment : ${item.item_equipment}">
-    <div>
-        <img th:src="${equipment.item_icon}" th:alt="${equipment.item_name}" width="100" height="100"/>
-        <p th:text="${equipment.item_name}"></p>
-        <p th:text="'장비 부위: ' + ${equipment.item_equipment_part}"></p>
-        <p th:text="'장비 slot: ' + ${equipment.equipment_slot}"></p>
-        <p th:text="'아이템 토탈 옵션: ' + ${equipment.itemTotalOption}"></p>
-        <p th:text="'아이템 잠재: ' + ${equipment.potential_option_1}"></p>
-        <p th:text="'아이템 잠재: ' + ${equipment.potential_option_2}"></p>
-        <p th:text="'아이템 잠재: ' + ${equipment.potential_option_3}"></p>
-        <p th:text="'아이템 에디 잠재: ' + ${equipment.additional_potential_option_1}"></p>
-        <p th:text="'아이템 에디 잠재: ' + ${equipment.additional_potential_option_2}"></p>
-        <p th:text="'아이템 에디 잠재: ' + ${equipment.additional_potential_option_3}"></p>
-        <p th:text="'아이템 익셉강화: ' + ${equipment.item_exceptional_option}"></p>
-        <p th:text="'소울: ' + ${equipment.soul_option}"></p>
-        <p th:text="'스타포스플래그?: ' + ${equipment.starforce_scroll_flag}"></p>
-                <!-- 기타 정보 표시 -->
-    </div>
-</div>
-
-<!--<tr th:each = "mapleResponseVo : {mapleResponseVo}">-->
-<!--    <td th:text = "${mapleResponseVo.}"></td>-->
-<!--</tr>-->
-<!-- 필요에 따라 더 많은 속성을 추가하세요 -->
 <table>
     <tr>
         <th>Character</th>
         <th>Class</th>
         <th>Level</th>
-        <th>Abilities</th>
+        <th>combatPower</th>
     </tr>
-<!--    <tr th:each="character : ${characters}">-->
-<!--        <td th:text="${character.name}"></td>-->
-<!--        <td th:text="${character.characterClass}"></td>-->
-<!--        <td th:text="${character.level}"></td>-->
-<!--        <td>-->
-<!--            <ul th:if="${character.abilities}">-->
-<!--                <li th:each="ability : ${character.abilities}" th:text="${ability}"></li>-->
-<!--            </ul>-->
-<!--            <span th:unless="${character.abilities}">None</span>-->
-<!--        </td>-->
-<!--    </tr>-->
+    <tr>
+        <td><img th:src ="${basic.character_image}">
+        </td>
+        <td th:text = "${basic.character_class}"></td>
+        <td th:text = "${basic.character_level}"></td>
+        <td th:text = "${combat}"></td>
+    </tr>
 </table>
+<!--<span th:if = "${}"></span>-->
+<!--<span th:text = "${item.item_equipment}"> </span>-->
+<form th:action = "@{/simpleLiberate}" method="post">
+    <input type="hidden" name="id" th:value="${innerResult.id}" />
+    <button type="submit"> 해방 </button>
+</form>
 </body>
 </html>

@@ -1,4 +1,4 @@
-package com.openapi.maplestory.liberation.domain.service;
+package com.openapi.maplestory.liberation.service;
 
 import com.openapi.maplestory.liberation.domain.dto.*;
 import com.openapi.maplestory.liberation.domain.dto.equipment.*;
@@ -640,8 +640,8 @@ public class CalculateService {
         int statPercent = 0;
         if (option == null) {
             return statPercent;
-        } else {
-            if (option.contains("%") && option.contains(stat)) {
+        }  else {
+            if (option.contains("%") && option.contains(stat) && !option.contains("피격")) {
                 String deleteStr = option.replaceAll("[^0-9]", "");
                 statPercent += Integer.parseInt(deleteStr);
             }

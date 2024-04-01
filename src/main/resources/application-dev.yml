@@ -6,14 +6,20 @@ spring:
     prefix: classpath:/templates/
     suffix: .html
     mode: HTML
-
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:testdb
-    username:
+    username: sa
     password:
 jpa:
   hibernate:
-    ddl-auto: update
-  show-sql: true
+    ddl-auto: create
+    show-sql: true
+  properties:
+    hibernate:
+      format_sql: true
   database-platform: org.hibernate.dialect.H2Dialect
