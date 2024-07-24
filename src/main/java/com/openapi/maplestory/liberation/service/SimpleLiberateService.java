@@ -1,8 +1,9 @@
 package com.openapi.maplestory.liberation.service;
 
-import com.openapi.maplestory.liberation.domain.dto.innerdto.AppliedDto;
-import com.openapi.maplestory.liberation.domain.dto.innerdto.InnerResultDto;
-import com.openapi.maplestory.liberation.domain.dto.innerdto.WeaponDto;
+import com.openapi.maplestory.liberation.domain.entity.ResultInfo;
+import com.openapi.maplestory.liberation.repository.dto.innerdto.AppliedStatDto;
+import com.openapi.maplestory.liberation.repository.dto.innerdto.ResultInfoDto;
+import com.openapi.maplestory.liberation.repository.dto.innerdto.WeaponStatDto;
 import com.openapi.maplestory.liberation.repository.InnerResultDtoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,41 +16,49 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class SimpleLiberateService {
     private final InnerResultDtoRepository innerResultDtoRepository;
+
     @Transactional
-    public long simpleLiberate(long id) {
-        InnerResultDto innerResultDto = innerResultDtoRepository.findInnerResultDto(id);
-        AppliedDto appliedDto = innerResultDto.getAppliedDto();
-        String mainPower = innerResultDto.getInnerDto().getMainPower();
-        WeaponDto weaponDto = innerResultDto.getWeaponDto();
+    public ResultInfoDto simpleLiberate(long id) {
+        ResultInfo innerResult = innerResultDtoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 id 가 없습니다 id = " + id));
+        ResultInfoDto resultInfoDto = innerResult.toResponseDto();
+        System.out.println("resultInfoDtoSImpl = " + resultInfoDto);
+        int simpleLiberate = resultInfoDto.getAppliedStatDto().getSimpleLiberate();
+        if(simpleLiberate == 1){
 
-        int totalAllStat = weaponDto.getTotalAllStat();
-        int totalDamage = weaponDto.getTotalDamage();
-        int totalMainStat = weaponDto.getTotalMainStat();
-        int totalSubStat = weaponDto.getTotalSubStat();
-        int totalMainPower = weaponDto.getTotalMainPower();
+        }
+        AppliedStatDto appliedStatDto = resultInfoDto.getAppliedStatDto();
+        String mainPower = resultInfoDto.getBasicInfoDto().getMainPower();
+        WeaponStatDto weaponStatDto = resultInfoDto.getWeaponStatDto();
 
-        int constantCorrection = weaponDto.getConstantCorrection();
+        int totalAllStat = weaponStatDto.getTotalAllStat();
+        int totalDamage = weaponStatDto.getTotalDamage();
+        int totalMainStat = weaponStatDto.getTotalMainStat();
+        int totalSubStat = weaponStatDto.getTotalSubStat();
+        int totalMainPower = weaponStatDto.getTotalMainPower();
 
-        int allStatPercent = weaponDto.getAllStatPercent();
-        int mainStatPercent = weaponDto.getMainStatPercent();
-        int subStatPercent = weaponDto.getSubStatPercent();
-        int powerPercent = weaponDto.getPowerPercent();
-        int damagePercent = weaponDto.getDamagePercent();
-        String soulOption = weaponDto.getSoulOption();
+        int constantCorrection = weaponStatDto.getConstantCorrection();
+
+        int allStatPercent = weaponStatDto.getAllStatPercent();
+        int mainStatPercent = weaponStatDto.getMainStatPercent();
+        int subStatPercent = weaponStatDto.getSubStatPercent();
+        int powerPercent = weaponStatDto.getPowerPercent();
+        int damagePercent = weaponStatDto.getDamagePercent();
+        String soulOption = weaponStatDto.getSoulOption();
 
 
-        int justAllStat = weaponDto.getJustAllStat();
-        int justMainStat = weaponDto.getJustMainStat();
-        int justSubStat = weaponDto.getJustSubStat();
-        int justPowerStat = weaponDto.getJustPowerStat();
+        int justAllStat = weaponStatDto.getJustAllStat();
+        int justMainStat = weaponStatDto.getJustMainStat();
+        int justSubStat = weaponStatDto.getJustSubStat();
+        int justPowerStat = weaponStatDto.getJustPowerStat();
 
-        int appliedDtoMainStat = appliedDto.getMainStat();
-        int appliedDtoSubStat = appliedDto.getSubStat();
-        int appliedDtoPower = appliedDto.getPower();
-        int appliedDtoMainStatPercent = appliedDto.getMainStatPercent();
-        int appliedDtoSubStatPercent = appliedDto.getSubStatPercent();
-        int appliedDtoPowerPercent = appliedDto.getPowerPercent();
-        double appliedDtoDamage = appliedDto.getDamage();
+        int appliedDtoMainStat = appliedStatDto.getMainStat();
+        int appliedDtoSubStat = appliedStatDto.getSubStat();
+        int appliedDtoPower = appliedStatDto.getPower();
+        int appliedDtoMainStatPercent = appliedStatDto.getMainStatPercent();
+        int appliedDtoSubStatPercent = appliedStatDto.getSubStatPercent();
+        int appliedDtoPowerPercent = appliedStatDto.getPowerPercent();
+        double appliedDtoDamage = appliedStatDto.getDamage();
 
         int calMainStat = appliedDtoMainStat - (totalMainStat + justMainStat + justAllStat);
         int calSubStat = appliedDtoSubStat - (totalSubStat + justSubStat + justAllStat);
@@ -59,18 +68,16 @@ public class SimpleLiberateService {
         int calMainPowerPercent = appliedDtoPowerPercent - (powerPercent);
         double calDamagePercent = appliedDtoDamage - (totalDamage + damagePercent);
 
-        weaponDto.setLiberation(1.1);
-        appliedDto.setSimpleLiberate(1);
-        appliedDto.setMainStat(calMainStat + 423);
-        appliedDto.setSubStat(calSubStat + 325);
-        appliedDto.setPower(calPower + 832);
-        appliedDto.setMainStatPercent(calMainStatPercent);
-        appliedDto.setSubStatPercent(calSubStatPercent);
-        appliedDto.setPowerPercent(calMainPowerPercent + 51);
-        appliedDto.setDamage(calDamagePercent + 80);
+        weaponStatDto.setLiberation(1.1);
+        appliedStatDto.setSimpleLiberate(1);
+        appliedStatDto.setMainStat(calMainStat + 423);
+        appliedStatDto.setSubStat(calSubStat + 325);
+        appliedStatDto.setPower(calPower + 832);
+        appliedStatDto.setMainStatPercent(calMainStatPercent);
+        appliedStatDto.setSubStatPercent(calSubStatPercent);
+        appliedStatDto.setPowerPercent(calMainPowerPercent + 51);
+        appliedStatDto.setDamage(calDamagePercent + 80);
 
-        innerResultDtoRepository.simpleLiberateUpdate(id,appliedDto,weaponDto);
-
-        return id;
+        return resultInfoDto;
     }
 }

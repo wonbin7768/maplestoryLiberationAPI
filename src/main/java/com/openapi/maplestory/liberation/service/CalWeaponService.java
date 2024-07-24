@@ -1,9 +1,9 @@
 package com.openapi.maplestory.liberation.service;
 
-import com.openapi.maplestory.liberation.domain.dto.BasicVo;
-import com.openapi.maplestory.liberation.domain.dto.equipment.*;
-import com.openapi.maplestory.liberation.domain.dto.innerdto.InnerDto;
-import com.openapi.maplestory.liberation.domain.dto.innerdto.WeaponDto;
+import com.openapi.maplestory.liberation.domain.BasicVo;
+import com.openapi.maplestory.liberation.domain.equipment.*;
+import com.openapi.maplestory.liberation.repository.dto.innerdto.BasicInfoDto;
+import com.openapi.maplestory.liberation.repository.dto.innerdto.WeaponStatDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -15,14 +15,14 @@ import java.util.Objects;
 @Service
 @Slf4j
 public class CalWeaponService {
-    public WeaponDto calWeapon(InnerDto innerDto, ItemVo itemVo, BasicVo basicVo) {
-        WeaponDto weaponDto = new WeaponDto();
+    public WeaponStatDto calWeapon(BasicInfoDto basicInfoDto, ItemVo itemVo, BasicVo basicVo) {
+        WeaponStatDto weaponStatDto = new WeaponStatDto();
         int level = basicVo.getCharacter_level();
-        String jobCase = innerDto.getJob();
-        List<String> weapon = innerDto.getWeapon();
-        String mainStat = innerDto.getMainStat();
-        String subStat = innerDto.getSubStat();
-        String mainPower = innerDto.getMainPower();
+        String jobCase = basicInfoDto.getJob();
+        List<String> weapon = basicInfoDto.getWeapon();
+        String mainStat = basicInfoDto.getMainStat();
+        String subStat = basicInfoDto.getSubStat();
+        String mainPower = basicInfoDto.getMainPower();
 
         int itemMainStat = 0;
         int itemSubStat = 0;
@@ -73,7 +73,8 @@ public class CalWeaponService {
                     starForce = Integer.parseInt(itemEquipmentVo.getStarforce());
 
                     weaponName = itemName;
-                    weaponDto.setWeaponName(itemName);
+                    System.out.println("weaponName = " + weaponName);
+                    weaponStatDto.setWeaponName(itemName);
                     switch (jobCase) {
                         case "럭덱":
                             totMainStat = Integer.parseInt(itemTotalOption.getLuk()) + Integer.parseInt(itemExceptionalOption.getLuk());
@@ -217,32 +218,32 @@ public class CalWeaponService {
         System.out.println("resultPower = " + resultPower);
         System.out.println("resultAdd = " + resultAdd);
         if (weaponName.contains("제네시스")) {
-            weaponDto.setLiberation(1.1);
+            weaponStatDto.setLiberation(1.1);
         } else {
-            weaponDto.setLiberation(1.0);
+            weaponStatDto.setLiberation(1.0);
         }
 
-        weaponDto.setDamagePercent(itemOptionDamage);
-        weaponDto.setPowerPercent(percentMainPower);
-        weaponDto.setMainStatPercent(percentMainStat);
-        weaponDto.setSubStatPercent(percentSubStat);
-        weaponDto.setJustPowerStat(justOptionMainPower);
+        weaponStatDto.setDamagePercent(itemOptionDamage);
+        weaponStatDto.setPowerPercent(percentMainPower);
+        weaponStatDto.setMainStatPercent(percentMainStat);
+        weaponStatDto.setSubStatPercent(percentSubStat);
+        weaponStatDto.setJustPowerStat(justOptionMainPower);
 
-        weaponDto.setJustMainStat(justOptionMainStat);
-        weaponDto.setJustSubStat(justOptionSubStat);
-        weaponDto.setJustAllStat(justOptionAllStat);
-        weaponDto.setAllStatPercent(percentAllStat);
+        weaponStatDto.setJustMainStat(justOptionMainStat);
+        weaponStatDto.setJustSubStat(justOptionSubStat);
+        weaponStatDto.setJustAllStat(justOptionAllStat);
+        weaponStatDto.setAllStatPercent(percentAllStat);
 
-        weaponDto.setTotalAllStat(itemAllStat);
-        weaponDto.setTotalMainPower(itemMainPower);
-        weaponDto.setTotalMainStat(itemMainStat);
-        weaponDto.setTotalSubStat(itemSubStat);
-        weaponDto.setTotalDamage(itemDamage);
+        weaponStatDto.setTotalAllStat(itemAllStat);
+        weaponStatDto.setTotalMainPower(itemMainPower);
+        weaponStatDto.setTotalMainStat(itemMainStat);
+        weaponStatDto.setTotalSubStat(itemSubStat);
+        weaponStatDto.setTotalDamage(itemDamage);
 
-        weaponDto.setConstantCorrection(resultPower);
-        weaponDto.setBonusGrade(addGrade);
+        weaponStatDto.setConstantCorrection(resultPower);
+        weaponStatDto.setBonusGrade(addGrade);
 
-        return weaponDto;
+        return weaponStatDto;
     }
 
     private int calItemPercentOption(String option, String stat) {
@@ -281,11 +282,11 @@ public class CalWeaponService {
 
     private int calWeaponBasicConstantCorrection(String weaponName, int weaponPower) {
         int basicCorrection = 0;
-        if (weaponName.contains("파프니르")) {
+        if (weaponName.contains("파프니르")|| weaponName.contains("7형")) {
             basicCorrection = 160 - weaponPower;
-        } else if (weaponName.contains("앱솔랩스")) {
+        } else if (weaponName.contains("앱솔랩스")|| weaponName.contains("8형")) {
             basicCorrection = 192 - weaponPower;
-        } else if (weaponName.contains("아케인셰이드")) {
+        } else if (weaponName.contains("아케인셰이드")|| weaponName.contains("9형")) {
             basicCorrection = 276 - weaponPower;
         }
         return basicCorrection;
@@ -295,7 +296,7 @@ public class CalWeaponService {
         int grade = 0;
 
         Map<String, Map<Integer, Integer>> weaponData = new HashMap<>();
-        if (weaponName.contains("파프니르")) {
+        if (weaponName.contains("파프니르")|| weaponName.contains("7형")) {
             weaponData.put("아대", Map.of(36, 1, 28, 2, 21, 3, 16, 4, 11, 5));
             weaponData.put("건", Map.of(52, 1, 40, 2, 31, 3, 22, 4, 15, 5));
             weaponData.put("폴암", Map.of(63, 1, 49, 2, 38, 3, 27, 4, 19, 5));
@@ -312,6 +313,9 @@ public class CalWeaponService {
             weaponData.put("체인", Map.of(66, 1, 52, 2, 39, 3, 29, 4, 20, 5));
             weaponData.put("단검", Map.of(66, 1, 52, 2, 39, 3, 29, 4, 20, 5));
             weaponData.put("부채", Map.of(66, 1, 52, 2, 39, 3, 29, 4, 20, 5));
+
+            weaponData.put("태도", Map.of(64, 1, 47, 2, 32, 3, 20, 4, 9, 5));
+            weaponData.put("대검", Map.of(64, 1, 47, 2, 32, 3, 20, 4, 9, 5));
 
             weaponData.put("한손검", Map.of(68, 1, 53, 2, 40, 3, 29, 4, 20, 5));
             weaponData.put("한손도끼", Map.of(68, 1, 53, 2, 40, 3, 29, 4, 20, 5));
@@ -335,7 +339,7 @@ public class CalWeaponService {
 
             weaponData.put("스태프", Map.of(84, 1, 66, 2, 50, 3, 36, 4, 25, 5));
 
-        } else if (weaponName.contains("앱솔랩스")) {
+        } else if (weaponName.contains("앱솔랩스")|| weaponName.contains("8형")) {
             weaponData.put("아대", Map.of(53, 1, 42, 2, 32, 3, 23, 4, 16, 5));
             weaponData.put("건", Map.of(77, 1, 60, 2, 46, 3, 33, 4, 23, 5));
             weaponData.put("폴암", Map.of(95, 1, 74, 2, 56, 3, 41, 4, 28, 5));
@@ -352,6 +356,10 @@ public class CalWeaponService {
             weaponData.put("체인", Map.of(99, 1, 77, 2, 59, 3, 43, 4, 29, 5));
             weaponData.put("단검", Map.of(99, 1, 77, 2, 59, 3, 43, 4, 29, 5));
             weaponData.put("부채", Map.of(99, 1, 77, 2, 59, 3, 43, 4, 29, 5));
+
+            weaponData.put("태도", Map.of(76, 1, 56, 2, 38, 3, 23, 4, 11, 5));
+            weaponData.put("대검", Map.of(76, 1, 56, 2, 38, 3, 23, 4, 11, 5));
+
 
             weaponData.put("한손검", Map.of(101, 1, 70, 2, 60, 3, 44, 4, 30, 5));
             weaponData.put("한손도끼", Map.of(101, 1, 70, 2, 60, 3, 44, 4, 30, 5));
@@ -375,7 +383,7 @@ public class CalWeaponService {
 
             weaponData.put("스태프", Map.of(126, 1, 98, 2, 75, 3, 54, 4, 37, 5));
 
-        } else if (weaponName.contains("아케인셰이드")) {
+        } else if (weaponName.contains("아케인셰이드")|| weaponName.contains("9형")) {
             weaponData.put("아대", Map.of(92, 1, 72, 2, 55, 3, 40, 4, 27, 5));
             weaponData.put("건", Map.of(133, 1, 104, 2, 79, 3, 58, 4, 39, 5));
             weaponData.put("폴암", Map.of(163, 1, 127, 2, 96, 3, 70, 4, 43, 5));
@@ -392,6 +400,10 @@ public class CalWeaponService {
             weaponData.put("체인", Map.of(179, 1, 133, 2, 101, 3, 73, 4, 50, 5));
             weaponData.put("단검", Map.of(179, 1, 133, 2, 101, 3, 73, 4, 50, 5));
             weaponData.put("부채", Map.of(179, 1, 133, 2, 101, 3, 73, 4, 50, 5));
+
+            weaponData.put("태도", Map.of(131, 1, 95, 2, 65, 3, 40, 4, 18, 5));
+            weaponData.put("대검", Map.of(131, 1, 95, 2, 65, 3, 40, 4, 18, 5));
+
 
             weaponData.put("한손검", Map.of(175, 1, 136, 2, 103, 3, 75, 4, 51, 5));
             weaponData.put("한손도끼", Map.of(175, 1, 136, 2, 103, 3, 75, 4, 51, 5));
@@ -425,7 +437,7 @@ public class CalWeaponService {
 
     private int calWeaponAddConstantCorrection(String weaponName, int grade) {
         int addCorrection = 0;
-        if (weaponName.contains("파프니르")) {
+        if (weaponName.contains("파프니르") || weaponName.contains("7형")) {
             switch (grade) {
                 case 1:
                     addCorrection = 66;
@@ -446,7 +458,7 @@ public class CalWeaponService {
                     addCorrection = 0;
                     break;
             }
-        } else if (weaponName.contains("앱솔랩스")) {
+        } else if (weaponName.contains("앱솔랩스") || weaponName.contains("8형")) {
             switch (grade) {
                 case 1:
                     addCorrection = 99;
@@ -467,7 +479,7 @@ public class CalWeaponService {
                     addCorrection = 0;
                     break;
             }
-        } else if (weaponName.contains("아케인셰이드")) {
+        } else if (weaponName.contains("아케인셰이드") || weaponName.contains("9형")) {
             switch (grade) {
                 case 1:
                     addCorrection = 170;
@@ -499,15 +511,15 @@ public class CalWeaponService {
         int akeWeaponPower = 276 + etcPower;
         int result = 0;
         if (starForce == 0) {
-            if (weaponName.contains("파프니르")) {
+            if (weaponName.contains("파프니르") || weaponName.contains("7형")) {
                 result = papWeaponPower;
-            } else if (weaponName.contains("앱솔랩스")) {
+            } else if (weaponName.contains("앱솔랩스") || weaponName.contains("8형")) {
                 result = appWeaponPower;
-            } else if (weaponName.contains("아케인")) {
+            } else if (weaponName.contains("아케인") || weaponName.contains("9형")) {
                 result = akeWeaponPower;
             }
         } else {
-            if (weaponName.contains("파프니르") && starForce > 0) {
+            if ((weaponName.contains("파프니르") || weaponName.contains("7형")) && starForce > 0) {
                 int starPower = 10;
                 for (int i = 1; i <= starForce; i++) {
                     if (i < 16) {
@@ -523,7 +535,7 @@ public class CalWeaponService {
                     }
                 }
                 result = papWeaponPower;
-            } else if (weaponName.contains("앱솔랩스") && starForce > 0) {
+            } else if ((weaponName.contains("앱솔랩스") || weaponName.contains("8형")) && starForce > 0) {
                 int starPower = 10;
                 for (int i = 1; i <= starForce; i++) {
                     System.out.println("i = " + i);
@@ -541,7 +553,7 @@ public class CalWeaponService {
                     }
                 }
                 result = appWeaponPower;
-            } else if (weaponName.contains("아케인셰이드") && starForce > 0) {
+            } else if ((weaponName.contains("아케인셰이드")|| weaponName.contains("9형")) && starForce > 0) {
                 int starPower = 15;
                 for (int i = 1; i <= starForce; i++) {
                     if (i < 16) {

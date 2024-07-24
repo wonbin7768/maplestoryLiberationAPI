@@ -1,19 +1,19 @@
 package com.openapi.maplestory.liberation.service;
 
-import com.openapi.maplestory.liberation.domain.dto.*;
-import com.openapi.maplestory.liberation.domain.dto.equipment.*;
-import com.openapi.maplestory.liberation.domain.dto.equipment.cash.CashItemBaseVo;
-import com.openapi.maplestory.liberation.domain.dto.equipment.cash.CashItemEquipmentVo;
-import com.openapi.maplestory.liberation.domain.dto.equipment.cash.CashItemOptionVo;
-import com.openapi.maplestory.liberation.domain.dto.equipment.pet.ItemOption;
-import com.openapi.maplestory.liberation.domain.dto.equipment.pet.PetEquipmentVo;
-import com.openapi.maplestory.liberation.domain.dto.equipment.seteffect.SetEffectInfoVo;
-import com.openapi.maplestory.liberation.domain.dto.equipment.seteffect.SetEffectVo;
-import com.openapi.maplestory.liberation.domain.dto.equipment.seteffect.SetVo;
-import com.openapi.maplestory.liberation.domain.dto.innerdto.AppliedDto;
-import com.openapi.maplestory.liberation.domain.dto.innerdto.InnerDto;
-import com.openapi.maplestory.liberation.domain.dto.innerdto.UnAppliedDto;
-import com.openapi.maplestory.liberation.domain.dto.stat.*;
+import com.openapi.maplestory.liberation.domain.*;
+import com.openapi.maplestory.liberation.domain.equipment.*;
+import com.openapi.maplestory.liberation.domain.equipment.cash.CashItemBaseVo;
+import com.openapi.maplestory.liberation.domain.equipment.cash.CashItemEquipmentVo;
+import com.openapi.maplestory.liberation.domain.equipment.cash.CashItemOptionVo;
+import com.openapi.maplestory.liberation.domain.equipment.pet.ItemOption;
+import com.openapi.maplestory.liberation.domain.equipment.pet.PetEquipmentVo;
+import com.openapi.maplestory.liberation.domain.equipment.seteffect.SetEffectInfoVo;
+import com.openapi.maplestory.liberation.domain.equipment.seteffect.SetEffectVo;
+import com.openapi.maplestory.liberation.domain.equipment.seteffect.SetVo;
+import com.openapi.maplestory.liberation.domain.stat.*;
+import com.openapi.maplestory.liberation.repository.dto.innerdto.AppliedStatDto;
+import com.openapi.maplestory.liberation.repository.dto.innerdto.BasicInfoDto;
+import com.openapi.maplestory.liberation.repository.dto.innerdto.UnAppliedStatDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -24,14 +24,56 @@ import java.util.*;
 @Service
 @Slf4j
 public class CalculateService {
-    public UnAppliedDto calUnAppliedStat(InnerDto innerDto, BasicVo basicVo, HyperStatVo hyperStatVo, SymbolVo symbolVo, UnionStatVo unionStatVo, HexaStatVo hexaStatVo) {
-        UnAppliedDto unAppliedDto = new UnAppliedDto();
-        String jobCase = innerDto.getJob();
+    private static int getPetItemPower(PetEquipmentVo petEquipmentVo, String mainPower) {
+        int petItemPower = 0;
+        System.out.println("petEquipmentVo = " + petEquipmentVo);
+        if (petEquipmentVo.getPet_1_equipment() != null) {
+            List<ItemOption> petItemOption1 = petEquipmentVo.getPet_1_equipment().getItem_option();
+            for (ItemOption itemOption : petItemOption1) {
+                String optionType = itemOption.getOption_type();
+                String optionValue = itemOption.getOption_value();
+                if (Objects.equals(optionType, mainPower)) {
+                    String deleteStr = optionValue.replaceAll("[^0-9]", "");
+                    petItemPower += Integer.parseInt(deleteStr);
+                }
+            }
+        }
+        if (petEquipmentVo.getPet_2_equipment() != null) {
+            List<ItemOption> petItemOption2 = petEquipmentVo.getPet_2_equipment().getItem_option();
+            for (ItemOption itemOption : petItemOption2) {
+                String optionType = itemOption.getOption_type();
+                String optionValue = itemOption.getOption_value();
+                if (Objects.equals(optionType, mainPower)) {
+                    String deleteStr = optionValue.replaceAll("[^0-9]", "");
+                    petItemPower += Integer.parseInt(deleteStr);
+                }
+            }
+        }
+        if (petEquipmentVo.getPet_3_equipment() != null) {
+            List<ItemOption> petItemOption3 = petEquipmentVo.getPet_3_equipment().getItem_option();
+            for (ItemOption itemOption : petItemOption3) {
+                String optionType = itemOption.getOption_type();
+                String optionValue = itemOption.getOption_value();
+                if (Objects.equals(optionType, mainPower)) {
+                    String deleteStr = optionValue.replaceAll("[^0-9]", "");
+                    petItemPower += Integer.parseInt(deleteStr);
+                }
+            }
+        }
 
-        String mainStat = innerDto.getMainStat();
-        String subStat = innerDto.getSubStat();
-        String mainPower = innerDto.getMainPower();
-        List<String> weapon = innerDto.getWeapon();
+
+        return petItemPower;
+    }
+
+    public UnAppliedStatDto calUnAppliedStat(BasicInfoDto basicInfoDto, BasicVo basicVo, HyperStatVo hyperStatVo, SymbolVo symbolVo, UnionStatVo unionStatVo, HexaStatVo hexaStatVo) {
+        UnAppliedStatDto unAppliedStatDto = new UnAppliedStatDto();
+        String jobCase = basicInfoDto.getJob();
+        String characterClass = basicVo.getCharacter_class();
+
+        String mainStat = basicInfoDto.getMainStat();
+        String subStat = basicInfoDto.getSubStat();
+        String mainPower = basicInfoDto.getMainPower();
+        List<String> weapon = basicInfoDto.getWeapon();
 
         System.out.println("mainPower = " + mainPower);
         System.out.println("subStat = " + subStat);
@@ -78,6 +120,7 @@ public class CalculateService {
 
         int hyperMain = getHyperStat(hyperStatPreset, mainStat);
         int hyperSub = getHyperStat(hyperStatPreset, subStat);
+        int hyperStrSub = 0;
 
         int hyperPower = getHyperStat(hyperStatPreset, "공격력/마력");
         int hyperCriDamage = getHyperStat(hyperStatPreset, "크리티컬 데미지");
@@ -89,10 +132,18 @@ public class CalculateService {
 
         int unionMain = calUnionStat(unionStatVo.getUnion_raider_stat(), mainStat);
         int unionSub = calUnionStat(unionStatVo.getUnion_raider_stat(), subStat);
+        int unionStrSub = 0;
 
         int unionPower = calUnionStat(unionStatVo.getUnion_raider_stat(), "공격력/마력");
         int unionDamage = calUnionStat(unionStatVo.getUnion_raider_stat(), "보스 몬스터 공격 시 데미지");
         int unionCriDamage = calUnionStat(unionStatVo.getUnion_raider_stat(), "크리티컬 데미지");
+
+        if(characterClass.contains("듀얼블레이더")||characterClass.contains("카데나")||characterClass.contains("섀도어")){
+            hyperStrSub = getHyperStat(hyperStatPreset , "STR");
+            unionStrSub = calUnionStat(unionStatVo.getUnion_raider_stat(), "STR");
+        }
+        System.out.println("hyperStrSub = " + hyperStrSub);
+        System.out.println("unionStrSub = " + unionStrSub);
 
         System.out.println("unionPower = " + unionPower);
         System.out.println("unionDamage = " + unionDamage);
@@ -110,35 +161,37 @@ public class CalculateService {
         System.out.println("hexaDamage = " + hexaDamage);
         System.out.println("hexaCriDamage = " + hexaCriDamage);
 
-        unAppliedDto.setSymbol(totalSymbol);
-        unAppliedDto.setMainStat(hyperMain + unionMain + hexaStat);
-        unAppliedDto.setSubStat(hyperSub + unionSub);
+        unAppliedStatDto.setSymbol(totalSymbol);
+        unAppliedStatDto.setMainStat(hyperMain + unionMain + hexaStat);
+        unAppliedStatDto.setSubStat(hyperSub + unionSub);
 
-        unAppliedDto.setPower(hyperPower + unionPower + hexaPower);
-        unAppliedDto.setCriDamage(hyperCriDamage + unionCriDamage + hexaCriDamage);
-        unAppliedDto.setDamage(hyperDamage + unionDamage + hexaDamage);
+        unAppliedStatDto.setPower(hyperPower + unionPower + hexaPower);
+        unAppliedStatDto.setCriDamage(hyperCriDamage + unionCriDamage + hexaCriDamage);
+        unAppliedStatDto.setDamage(hyperDamage + unionDamage + hexaDamage);
+
+        unAppliedStatDto.setStrSubStat(hyperStrSub + unionStrSub);
 
         System.out.println("hexaStat = " + hexaStat);
         System.out.println("unionMain = " + unionMain);
         System.out.println("hyperMain = " + hyperMain);
         System.out.println("totalSymbol = " + totalSymbol);
 
-        return unAppliedDto;
+        return unAppliedStatDto;
     }
 
-    public AppliedDto calAppliedStat(InnerDto innerDto, BasicVo basic, StatVo stat, ItemVo itemVo, CashItemEquipmentVo cashItemEquipmentVo, AbilityVo abilityVo, SetVo setVo, CharacterSkillVo skillVo, String date, UnionStatVo unionStatVo, UnionArtifactVo unionArtifactVo, PetEquipmentVo petEquipmentVo) throws ParseException {
-        AppliedDto appliedDto = new AppliedDto();
+    public AppliedStatDto calAppliedStat(BasicInfoDto basicInfoDto, BasicVo basic, StatVo stat, ItemVo itemVo, CashItemEquipmentVo cashItemEquipmentVo, AbilityVo abilityVo, SetVo setVo, CharacterSkillVo skillVo, String date, UnionStatVo unionStatVo, UnionArtifactVo unionArtifactVo, PetEquipmentVo petEquipmentVo) throws ParseException {
+        AppliedStatDto appliedStatDto = new AppliedStatDto();
         List<Integer> zipAppliedStat = new ArrayList<>();
         //일단 주스탯 순수 스탯구하기
         int level = basic.getCharacter_level();
         String characterClass = basic.getCharacter_class();
         int pureStat = level * 5 + 18;
         System.out.println("pureStat = " + pureStat);
-        String mainStat = innerDto.getMainStat();
-        String subStat = innerDto.getSubStat();
-        String mainPower = innerDto.getMainPower();
-        String jobCase = innerDto.getJob();
-        List<String> weapon = innerDto.getWeapon();
+        String mainStat = basicInfoDto.getMainStat();
+        String subStat = basicInfoDto.getSubStat();
+        String mainPower = basicInfoDto.getMainPower();
+        String jobCase = basicInfoDto.getJob();
+        List<String> weapon = basicInfoDto.getWeapon();
         double criDamage = 0.0;
         double damage = 0.0;
         //캐시장비
@@ -147,7 +200,9 @@ public class CalculateService {
         Date nowDate1 = format.parse(date);
         int cashItemMainStat = 0;
         int cashItemSubStat = 0;
+        int cashItemStrSubStat = 0;
         int cashItemMainPower = 0;
+
 
         for (CashItemBaseVo cashItemBaseVo : cashItemEquipmentBase) {
             System.out.println("cashItemBaseVo = " + cashItemBaseVo.getCashItemOptionVo());
@@ -159,6 +214,8 @@ public class CalculateService {
                     cashItemMainStat += optionValue;
                 } else if (Objects.equals(optionType, subStat)) {
                     cashItemSubStat += optionValue;
+                } else if (Objects.equals(optionType, "STR")) {
+                    cashItemStrSubStat += optionValue;
                 } else if (Objects.equals(optionType, mainPower)) {
                     cashItemMainPower += optionValue;
                 }
@@ -167,7 +224,7 @@ public class CalculateService {
         System.out.println("cashItemMain= " + cashItemMainStat);
         System.out.println("cashItemMainPower = " + cashItemMainPower);
         System.out.println("cashItemSubStat = " + cashItemSubStat);
-
+        System.out.println("cashItemStrSubStat = " + cashItemStrSubStat);
 
 //        List<AbilityInfo> abilityInfo = abilityVo.getAbility_info();
 //        for (AbilityInfo info : abilityInfo) {
@@ -181,6 +238,7 @@ public class CalculateService {
         int calSetStat = 0;
         int calSetMainPower = 0;
         int calSetSubStat = 0;
+        int calSetStrSubStat = 0;
         double calSetDamage = 0.0;
         double calSetCriDamage = 0.0;
 
@@ -196,12 +254,16 @@ public class CalculateService {
                         String deleteStr = option.replaceAll("[^0-9]", "");
                         calSetStat += Integer.parseInt(deleteStr);
                         calSetSubStat += Integer.parseInt(deleteStr);
+                        calSetStrSubStat += Integer.parseInt(deleteStr);
                     } else if (option.contains(mainStat)) {
                         String deleteStr = option.replaceAll("[^0-9]", "");
                         calSetStat += Integer.parseInt(deleteStr);
                     } else if (option.contains(subStat)) {
                         String deleteStr = option.replaceAll("[^0-9]", "");
                         calSetSubStat += Integer.parseInt(deleteStr);
+                    } else if (option.contains("STR")) {
+                        String deleteStr = option.replaceAll("[^0-9]", "");
+                        calSetStrSubStat += Integer.parseInt(deleteStr);
                     } else if (option.contains(mainPower)) {
                         String deleteStr = option.replaceAll("[^0-9]", "");
                         calSetMainPower += Integer.parseInt(deleteStr);
@@ -215,11 +277,13 @@ public class CalculateService {
                 }
             }
         }
+
         System.out.println("calSetStat = " + calSetStat);
         System.out.println("calSetMainPower = " + calSetMainPower);
         System.out.println("calSetSubStat = " + calSetSubStat);
         System.out.println("calSetDamage = " + calSetDamage);
         System.out.println("calSetCriDamage = " + calSetCriDamage);
+        System.out.println("calSetStrSubStat = " + calSetStrSubStat);
 
 
         int titleStat = 0;
@@ -289,6 +353,16 @@ public class CalculateService {
         int itemDamage = 0;
         int itemCriDamage = 0;
 
+        int zeroSubWeaponStr = 0;
+        int zeroSubWeaponDex = 0;
+        int zeroSubWeaponPower = 0;
+        double zeroSubWeaponDamage = 0.0;
+
+        int itemStrSubStat = 0;
+        int percentStrSubStat = 0;
+        int justOptionStrSubStat = 0;
+
+
         List<ItemEquipmentVo> itemEquipment = itemVo.getItem_equipment();
         for (ItemEquipmentVo itemEquipmentVo : itemEquipment) {
             ItemTotalOptionVo itemTotalOption = itemEquipmentVo.getItemTotalOption();
@@ -296,6 +370,12 @@ public class CalculateService {
             int totMainStat = 0;
             int totSubStat = 0;
             int totMainPower = 0;
+
+            int totStrSubStat = 0;
+            if(characterClass.contains("듀얼블레이더")||characterClass.contains("카데나")||characterClass.contains("섀도어")){
+                totStrSubStat = Integer.parseInt(itemTotalOption.getStr());
+                System.out.println("totStrSubStat = " + totStrSubStat);
+            }
             switch (jobCase) {
                 case "럭덱":
                     totMainStat = Integer.parseInt(itemTotalOption.getLuk()) + Integer.parseInt(itemExceptionalOption.getLuk());
@@ -348,11 +428,26 @@ public class CalculateService {
                     weaponBol = true;
                 }
             }
+            System.out.println("itemEquipmentPart = " + itemEquipmentPart);
+            String itemName = itemEquipmentVo.getItem_name();
+            if (itemName.contains("딥다크")){
+                itemCriDamage += 5;
+            }
+
+            if(itemEquipmentPart.contains("대검")){
+                ItemAddOptionVo itemAddOption = itemEquipmentVo.getItem_add_option();
+                zeroSubWeaponStr = Integer.parseInt(itemTotalOption.getStr()) + 1;
+                zeroSubWeaponDex = Integer.parseInt(itemTotalOption.getDex());
+                zeroSubWeaponPower = Integer.parseInt(itemTotalOption.getAttack_power()) - Integer.parseInt(itemAddOption.getAttack_power()) + 1;
+                zeroSubWeaponDamage = Integer.parseInt(itemTotalOption.getBoss_damage()) - Integer.parseInt(itemAddOption.getBoss_damage());
+            }
             itemMainStat += totMainStat;
             itemSubStat += totSubStat;
             itemAllStat += Integer.parseInt(totAllStat);
             itemMainPower += totMainPower;
             itemDamage += Integer.parseInt(itemTotalOption.getDamage()) + Integer.parseInt(itemTotalOption.getBoss_damage());
+
+            itemStrSubStat += totStrSubStat;
 
             if (soulOption != null) {
                 System.out.println("soulOption = " + soulOption);
@@ -373,11 +468,16 @@ public class CalculateService {
                     itemDamage += Integer.parseInt(deleteStr);
                 }
             }
-            if (itemEquipmentPart.contains("아대")) {
-                //System.out.println(" = " + );
-                //112
+            if (totStrSubStat != 0){
+                for (Object option : potentialOption) {
+                    percentStrSubStat += calItemPercentOption((String) option, "STR");
+                    justOptionStrSubStat += calItemJustStatOption((String) option, "STR", level);
+                }
+                for (Object additionalOption : additionalPotentialOption) {
+                    percentStrSubStat += calItemPercentOption((String) additionalOption, "STR");
+                    justOptionStrSubStat += calItemJustStatOption((String) additionalOption, "STR", level);
+                  }
             }
-
             for (Object option : potentialOption) {
                 percentMainStat += calItemPercentOption((String) option, mainStat);
                 percentSubStat += calItemPercentOption((String) option, subStat);
@@ -410,6 +510,8 @@ public class CalculateService {
         }
         int unionAppliedMainStat = calUnionStat(unionStatVo.getUnion_occupied_stat(), mainStat);
         int unionAppliedSubStat = calUnionStat(unionStatVo.getUnion_occupied_stat(), subStat);
+        int unionAppliedStrSubStat = calUnionStat(unionStatVo.getUnion_occupied_stat(), "STR");
+
         double unionAppliedPower = calUnionOccupiedStat(unionStatVo.getUnion_occupied_stat(), mainPower);
         double unionAppliedDamage = calUnionOccupiedStat(unionStatVo.getUnion_occupied_stat(), "보스 몬스터 공격 시 데미지");
         double unionAppliedCriDamage = calUnionOccupiedStat(unionStatVo.getUnion_occupied_stat(), "크리티컬 데미지");
@@ -481,9 +583,51 @@ public class CalculateService {
         String blessEffect = "";
         int blessPowerA = 0;
         int blessPowerB = 0;
+
+        int mayakPower = 0;
+        double mayakDamage = 0.0;
+        int mayakAllStat = 0;
+
+        int rebootPower = 0;
+        double rebootLastDamage = 0.0;
+
         List<SkillVo> skillVo1 = skillVo.getSkillVo();
         for (SkillVo vo : skillVo1) {
             String skillName = vo.getSkill_name();
+            System.out.println("vo = " + vo);
+            /*
+            * 마약 스킬 변경 때마다 변경해줘야함
+            * 아 근데 이거 어떻게 자동화 할수 있는 로직이 없을까
+            * */
+            if (skillName.contains("리부트")){
+                rebootPower = 5;
+                String skillEffect = vo.getSkill_effect();
+                System.out.println("skillEffect = " + skillEffect);
+                if(level > 199 && level < 250){
+                    rebootLastDamage = 1.35;
+                } else if (level > 249) {
+                    rebootLastDamage = 1.45;
+                }
+            }
+            if(skillName.contains("아스완")){
+                String skillEffect = vo.getSkill_effect();
+                String[] split = skillEffect.split("증가");
+                for (String s : split) {
+                    if (s.contains("보스 몬스터 공격")){
+                        System.out.println("s = " + s);
+                        String deleteStr = s.replaceAll("[^0-9]", "");
+                        mayakDamage += Integer.parseInt(deleteStr);
+                    } else if (s.contains(mainPower)){
+                        System.out.println("s = " + s);
+                        String deleteStr = s.replaceAll("[^0-9]", "");
+                        mayakPower += Integer.parseInt(deleteStr);
+                    } else if (s.contains("올스탯")){
+                        System.out.println("s = " + s);
+                        String deleteStr = s.replaceAll("[^0-9]", "");
+                        mayakAllStat += Integer.parseInt(deleteStr);
+                    }
+                }
+            }
             if (skillName.contains("정령의 축복")) {
                 blessEffect = vo.getSkill_effect();
                 String[] split = blessEffect.split(",");
@@ -519,6 +663,11 @@ public class CalculateService {
                 }
             }
         }
+        System.out.println("mayakAllStat = " + mayakAllStat);
+        System.out.println("mayakDamage = " + mayakDamage);
+        System.out.println("mayakPower = " + mayakPower);
+        System.out.println("rebootPower = " + rebootPower);
+        System.out.println("rebootLastDamage = " + rebootLastDamage);
         int finalBlessPower = 0;
         if (blessPowerA >= blessPowerB) {
             finalBlessPower = blessPowerA;
@@ -559,31 +708,49 @@ public class CalculateService {
         System.out.println("unionArtifactStat = " + unionArtifactStat);
 
 
-        int lastMainStat = pureStat + cashItemMainStat + calSetStat + titleStat + unionAppliedMainStat + unionArtifactStat + itemMainStat + justOptionMainStat + justOptionAllStat;
-        int lastSubStat = 4 + cashItemSubStat + calSetSubStat + titleStat + unionAppliedSubStat + unionArtifactStat + itemSubStat + justOptionSubStat + justOptionAllStat;
+        int lastMainStat = pureStat + cashItemMainStat + calSetStat + titleStat + unionAppliedMainStat + unionArtifactStat + itemMainStat + justOptionMainStat + justOptionAllStat + mayakAllStat - zeroSubWeaponStr;
+        int lastSubStat = 4 + cashItemSubStat + calSetSubStat + titleStat + unionAppliedSubStat + unionArtifactStat + itemSubStat + justOptionSubStat + justOptionAllStat + mayakAllStat - zeroSubWeaponDex;
+
+        int lastStrSubStat = 0;
+        int lastPercentStrSubStat = 0;
+
         double lastMainPower = 0;
-        if(petSetPower != 0){
-            lastMainPower = cashItemMainPower + calSetMainPower + titlePower + unionAppliedPower + unionArtifactPower + finalBlessPower + petSetPower + itemMainPower + justOptionMainPower + petItemPower + abilityPower;
+        if (petSetPower != 0) {
+            lastMainPower = cashItemMainPower + calSetMainPower + titlePower + unionAppliedPower + unionArtifactPower + finalBlessPower + petSetPower + itemMainPower + justOptionMainPower + petItemPower + abilityPower + mayakPower - zeroSubWeaponPower + rebootPower;
         } else {
-            lastMainPower = cashItemMainPower + calSetMainPower + titlePower + unionAppliedPower + unionArtifactPower + finalBlessPower + petSetPower + itemMainPower + justOptionMainPower + abilityPower;
+            lastMainPower = cashItemMainPower + calSetMainPower + titlePower + unionAppliedPower + unionArtifactPower + finalBlessPower + petSetPower + itemMainPower + justOptionMainPower + abilityPower + mayakPower - zeroSubWeaponPower + rebootPower;
         }
         int lastPercentMainStat = percentMainStat + percentAllStat + itemAllStat;
         int lastPercentSubStat = percentSubStat + percentAllStat + itemAllStat;
         int lastPercentMainPower = percentMainPower;
 
-        double lastDamage = calSetDamage + titleDamage + unionAppliedDamage + unionArtifactDamage + unionArtifactBossDamage + itemDamage + abilityDamage;
+        double lastDamage = calSetDamage + titleDamage + unionAppliedDamage + unionArtifactDamage + unionArtifactBossDamage + itemDamage + abilityDamage + mayakDamage - zeroSubWeaponDamage;
         double lastCriDamage = calSetCriDamage + unionAppliedCriDamage + unionArtifactCriDamage + itemCriDamage;
 
-        appliedDto.setMainStat(lastMainStat);
-        appliedDto.setSubStat(lastSubStat);
-        appliedDto.setPower((int) lastMainPower);
+        if(characterClass.contains("듀얼블레이더")||characterClass.contains("카데나")||characterClass.contains("섀도어")){
+            lastStrSubStat = 4 +cashItemStrSubStat + calSetStrSubStat + calSetStrSubStat + titleStat + unionAppliedStrSubStat + unionArtifactStat + itemStrSubStat + justOptionStrSubStat + justOptionAllStat + mayakAllStat;
+            lastPercentStrSubStat = percentStrSubStat + percentAllStat + itemAllStat;
+        }
 
-        appliedDto.setMainStatPercent(lastPercentMainStat);
-        appliedDto.setSubStatPercent(lastPercentSubStat);
-        appliedDto.setPowerPercent(lastPercentMainPower);
+        System.out.println("lastPercentSubStat = " + lastPercentSubStat);
+        System.out.println("lastStrSubStat = " + lastStrSubStat);
+        System.out.println("itemStrSubStat = " + itemStrSubStat);
+        System.out.println("lastPercentStrSubStat = " + lastPercentStrSubStat);
 
-        appliedDto.setDamage(lastDamage);
-        appliedDto.setCriDamage(lastCriDamage);
+        appliedStatDto.setMainStat(lastMainStat);
+        appliedStatDto.setSubStat(lastSubStat);
+        appliedStatDto.setPower((int) lastMainPower);
+
+        appliedStatDto.setMainStatPercent(lastPercentMainStat);
+        appliedStatDto.setSubStatPercent(lastPercentSubStat);
+        appliedStatDto.setPowerPercent(lastPercentMainPower);
+
+        appliedStatDto.setDamage(lastDamage);
+        appliedStatDto.setCriDamage(lastCriDamage);
+        appliedStatDto.setRebootLastDamage(rebootLastDamage);
+
+        appliedStatDto.setSubStrStat(lastStrSubStat);
+        appliedStatDto.setSubStrStatPercent(lastPercentStrSubStat);
 
         System.out.println("lastMainStat = " + lastMainStat);
         System.out.println("lastSubStat = " + lastSubStat);
@@ -594,53 +761,14 @@ public class CalculateService {
         System.out.println("lastDamage = " + lastDamage);
         System.out.println("lastCriDamage = " + lastCriDamage);
 
-        return appliedDto;
-    }
-
-    private static int getPetItemPower(PetEquipmentVo petEquipmentVo, String mainPower) {
-        int petItemPower = 0;
-        System.out.println("petEquipmentVo = " + petEquipmentVo);
-        if (petEquipmentVo.getPet_1_equipment() != null) {
-            List<ItemOption> petItemOption1 = petEquipmentVo.getPet_1_equipment().getItem_option();
-            for (ItemOption itemOption : petItemOption1) {
-                String optionType = itemOption.getOption_type();
-                String optionValue = itemOption.getOption_value();
-                if (Objects.equals(optionType, mainPower)) {
-                    String deleteStr = optionValue.replaceAll("[^0-9]", "");
-                    petItemPower += Integer.parseInt(deleteStr);
-                }
-            }
-        } if (petEquipmentVo.getPet_2_equipment() != null) {
-            List<ItemOption> petItemOption2 = petEquipmentVo.getPet_2_equipment().getItem_option();
-            for (ItemOption itemOption : petItemOption2) {
-                String optionType = itemOption.getOption_type();
-                String optionValue = itemOption.getOption_value();
-                if (Objects.equals(optionType, mainPower)) {
-                    String deleteStr = optionValue.replaceAll("[^0-9]", "");
-                    petItemPower += Integer.parseInt(deleteStr);
-                }
-            }
-        } if (petEquipmentVo.getPet_3_equipment() != null) {
-            List<ItemOption> petItemOption3 = petEquipmentVo.getPet_3_equipment().getItem_option();
-            for (ItemOption itemOption : petItemOption3) {
-                String optionType = itemOption.getOption_type();
-                String optionValue = itemOption.getOption_value();
-                if (Objects.equals(optionType, mainPower)) {
-                    String deleteStr = optionValue.replaceAll("[^0-9]", "");
-                    petItemPower += Integer.parseInt(deleteStr);
-                }
-            }
-        }
-
-
-        return petItemPower;
+        return appliedStatDto;
     }
 
     private int calItemPercentOption(String option, String stat) {
         int statPercent = 0;
         if (option == null) {
             return statPercent;
-        }  else {
+        } else {
             if (option.contains("%") && option.contains(stat) && !option.contains("피격")) {
                 String deleteStr = option.replaceAll("[^0-9]", "");
                 statPercent += Integer.parseInt(deleteStr);
@@ -703,7 +831,6 @@ public class CalculateService {
                 .sum();
     }
 
-
     public double filterHexaStat(HexaStatVo hexaStatVo, String statType) {
         double result = 0;
         int x = 0;
@@ -711,10 +838,10 @@ public class CalculateService {
         List<HexaStatDetailVo> hexaStatDetailVo = hexaStatVo.getHexaStatDetailVo();
         for (HexaStatDetailVo statDetailVo : hexaStatDetailVo) {
             System.out.println("statDetailVo = " + statDetailVo);
-            if (Objects.equals(statDetailVo.getMain_stat_name(), statType) && statDetailVo.getMain_stat_level() != 0 ) {
+            if (Objects.equals(statDetailVo.getMain_stat_name(), statType) && statDetailVo.getMain_stat_level() != 0) {
                 isMainStat = true;
                 x = (statDetailVo.getMain_stat_level()) - 1;
-            } else if (Objects.equals(statDetailVo.getSub_stat_name_1(), statType) && statDetailVo.getSub_stat_level_1() !=0 ) {
+            } else if (Objects.equals(statDetailVo.getSub_stat_name_1(), statType) && statDetailVo.getSub_stat_level_1() != 0) {
                 isMainStat = false;
                 x = (statDetailVo.getSub_stat_level_1()) - 1;
             } else if (Objects.equals(statDetailVo.getSub_stat_name_2(), statType) && statDetailVo.getSub_stat_level_2() != 0) {

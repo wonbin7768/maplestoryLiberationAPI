@@ -13,9 +13,11 @@ public class DateUtil {
         LocalDateTime yesterday = now.minusDays(1);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(tzSeoul.toZoneId());
         String date = yesterday.format(formatter);
+        String nowDate = now.format(formatter);
         System.out.println("now = " + now);
         System.out.println("yesterday = " + yesterday);
         System.out.println("date = " + date);
+
         return date;
     }
 }

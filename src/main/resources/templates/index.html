@@ -1,22 +1,240 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <title>dd</title>
+    <title>메이플스토리 해방 할 캐릭터 선택</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style>
+        body {
+          font-family: Arial, sans-serif;
+          background-color: rgb(71, 3, 3);
+          text-align: center;
+          padding: 50px;
+
+        }
+
+        .h1_wrap_div {
+          width: 100%;
+        }
+
+        h1 {
+
+          margin-bottom: 15px;
+          color: rgb(240, 240, 240);
+        }
+
+        .body_wrap {
+          display: flex;
+          justify-content: center;
+          color: #fffc40;
+          flex-wrap: wrap;
+        }
+
+        .first_wrap_div {
+          padding: 10px;
+          max-width: 500px;
+          max-height: 1000px;
+          display: flex;
+          flex-wrap: wrap;
+          background-color: rgb(104, 51, 62);
+          border-radius: 10px;
+          box-shadow: 10px 10px 0px 0px rgb(208, 166, 163);
+          < !-- background-repeat: no-repeat;
+          -->< !-- background-position: center;
+          -->< !-- background-size: contain;
+          -->
+        }
+
+        .form_wrap_div {
+          width: 100%;
+        }
+
+        form {
+          width: 90%;
+          border-radius: 5px;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          display: inline-block;
+          margin-bottom: 5px;
+        }
+
+        input[type="text"] {
+          padding: 15px;
+          margin: 10px;
+          width: 90%;
+          border: 1px solid #ccc;
+          border-radius: 3px;
+          font-size: 16px;
+        }
+
+        #errorText {
+          color: red;
+          font-weight: bold;
+          font-size: 18px;
+          margin-bottom: 10px;
+        }
+
+        .btn_wrap_div_first {
+          margin: 0px 5px 7px 5px;
+          height: 30px;
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          border-radius: 0px 0px 20px 20px;
+        }
+
+        .btn_wrap_div {
+          width: 100%;
+          height: 100%;
+          margin-top: 5px;
+          margin-bottom: 10px;
+        }
+
+        .btn {
+          width: 100%;
+          height: 100%;
+          background-color: #d26547;
+          border: none;
+          color: white;
+          font-size: 13px;
+          font-weight: bold;
+          cursor: pointer;
+          border-radius: 7px;
+          text-align: center;
+          position: relative;
+          text-decoration: none;
+          display: block;
+          box-shadow: 0px 5px 0px 0px #bd4032;
+          transition: all 0.2s;
+        }
+
+        .btn:hover {
+          margin-top: 5px;
+          margin-bottom: 5px;
+          box-shadow: 0px 0px 0px 0px #a66615;
+        }
+
+        .foot_wrap_div {
+          width: 100%;
+        }
+
+        .foot_head {
+          margin-bottom: 10px;
+          font-size: 18px;
+          font-weight: bold;
+        }
+
+        .foot_content {
+          margin-left: 10px;
+          margin-bottom: 8px;
+          text-align: left;
+        }
+
+        .simbol_div {
+          width: 100%;
+          height: 500px;
+        }
+
+        .simbol_img {
+          width: 100%;
+          height: 100%;
+          border-radius: 3px;
+        }
+
+        .title_wrap {
+          width: 100%;
+          margin-bottom: 15px;
+          font-size: 20px;
+        }
+
+        .footer-wrap {
+          background-color: #333;
+          color: #fff;
+          padding: 40px 0;
+        }
+
+        .footer-bottom {
+          text-align: center;
+          margin-top: 20px;
+          font-size: 14px;
+          color: #999;
+        }
+    </style>
+    <script th:inline="javascript">
+        var message = /*[[${message}]]*/ "";
+        var uri = /*[[${uri}]]*/ "";
+        if (message) {
+          alert(message);
+          window.location.href = uri;
+        }
+
+        function validateForm() {
+          var input = document.getElementById("name").value;
+          var koreanLength = input.replace(/[^가-힣]/g, "").length; // 한글 글자 수
+          var otherLength = input.replace(/[가-힣]/g, "").length; // 영어나 숫자 글자 수
+          var totalLength = koreanLength * 1 + otherLength * 0.5; // 총 글자 수 계산
+          if (
+            input.length == 0 || input.includes(" ") ||
+            /[^a-zA-Z0-9가-힣]/.test(input) ||
+            totalLength <= 2 ||
+            totalLength > 5
+              ) {
+            document.getElementById("errorText").innerText =
+              "입력 형식이 올바르지 않습니다.";
+            return false; // 폼 제출을 막습니다.
+          }
+          return true; // 유효한 경우에 폼을 제출합니다.
+        }
+    </script>
 </head>
-<script th:inline="javascript">
-    var message = /*[[${message}]]*/ '';
-    var uri = /*[[${uri}]]*/ '';
-    if(message){
-        alert(message);
-        window.location.href = uri;
-    }
-</script>
+
 <body>
-<h1>해방할 캐릭터 선택</h1>
-<form th:action = "@{/getMapleInfo}" method="get">
-    <input type="text" name = "name">
-    <button type="submit"> 찾기 </button>
-</form>
+<div class="body_wrap">
+    <!--    <img class="simbol_img" th:src="@{/images/blackMagition.jpg}"/>-->
+    <div class="title_wrap">
+        <h1> 해방 할까? </h1>
+    </div>
+    <div class="first_wrap_div">
+        <!--        th:style ="'background-image:url(/images/blackMagition.jpg)'"-->
+        <!--        <div class="simbol_div"></div>-->
+        <div class="h1_wrap_div">
+            <h1>해방 할 캐릭터 선택</h1>
+        </div>
+        <div class="form_wrap_div">
+            <form class="btn_form" th:action="@{/getMapleInfo}" method="get" onsubmit="return validateForm()">
+                <input type="text" id="name" name="name" placeholder="캐릭터 닉네임을 입력해주세요" />
+                <div id="errorText"></div>
+                <!-- 에러 메시지 표시 영역 -->
+                <div class="btn_wrap_div_first">
+                    <div class="btn_wrap_div">
+                        <button class="btn" type="submit">찾기</button>
+                    </div>
+                </div>
+                <div class="foot_wrap_div">
+                    <div>
+                        <div class="foot_head">** 주의 사항 ** </div>
+                        <div class="foot_content">
+                            전투력은 직접 계산 됩니다!</br>
+                            고로 약간의 오차가 있을수 있습니다:)</br>
+                            데벤 , 제논은 아직 구현 되지 않았습니다 ㅠ</br>
+                            실시간 검색 이므로 프리셋을 바꾼지 얼마되지 않았다면</br>
+                            잠시 기다려주십시요 </br>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="footer_wrap">
+    <div class="footer">
+        <div class="footer-bottom">
+            <p>&copy; 2024 해방할까?</p>
+            <p>'Data based on NEXON Open API'</p>
+        </div>
+    </div>
+</div>
+
 </body>
+
 </html>

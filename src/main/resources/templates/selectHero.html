@@ -3,7 +3,7 @@
 
 <head>
     <title>메이플스토리 요청 세부 정보</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,24 +11,13 @@
             text-align: center;
             padding: 50px;
         }
+
         .body_wrap {
             display: flex;
             justify-content: center;
             color: #d1d1d1;
         }
-        @keyframes burning {
-            0% {
-                box-shadow: 0 0 20px rgba(255, 165, 0, 0.5);
-            }
 
-             50% {
-               box-shadow: 0 0 40px rgba(255, 165, 0, 0.8);
-              }
-
-             100% {
-              box-shadow: 0 0 20px rgba(255, 165, 0, 0.5);
-             }
-        }
         .first_wrap_div {
             padding: 20px;
             max-width: 500px;
@@ -38,7 +27,6 @@
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
             justify-content: center;
-            animation: burning 2s infinite;
         }
 
         .second_wrap_div {
@@ -75,22 +63,14 @@
             border-radius: 50%;
             overflow: hidden;
             background-color: #3b3b3b;
-            transition: background-color 0.5s ease-in-out;
         }
 
         .profil_img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: filter 0.5s ease-in-out;
-        }
-         .wrap_img:hover {
-            background-color: #4b4b4b;
         }
 
-        .wrap_img:hover .profil_img {
-            filter: brightness(1.2);
-        }
         .title {
             margin-top: 10px;
             font-size: 16px;
@@ -173,25 +153,13 @@
             color: #d1d1d1;
             font-size: 24px;
             margin-top: 10px;
-            animation: combatPowerChange 1s ease-in-out;
         }
 
         .content_liber_combat {
-            color: red;
+            color: #66bb6a;
             font-size: 22px;
-            animation: combatPowerChange 1s ease-in-out;
         }
-        @keyframes combatPowerChange {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.2);
-            }
-            100% {
-                transform: scale(1);
-            }
-        }
+
         .title_liber_nick {
             color: #d1d1d1;
             font-size: 18px;
@@ -207,7 +175,7 @@
         .foot_wrap_div{
            justify-content: center;
         }
-          .footer-wrap {
+        .footer-wrap {
           background-color: #333;
           color: #fff;
           padding: 40px 0;
@@ -226,7 +194,7 @@
 <div class="body_wrap">
     <div class="first_wrap_div">
         <div class="h1_wrap_div">
-            <h1>딸깍 해방</h1>
+            <h1>해방할 캐릭</h1>
         </div>
         <div class="wrap_info">
             <div class="wrap_div">
@@ -243,24 +211,19 @@
                 </div>
             </div>
         </div>
+
         <div class="foot_wrap_div">
             <div>
-                <div class="foot_head">** 디테일 해방 이란? **</div>
-                <div class="foot_content"> 추옵 잠재를 선택하여 다시 본인에 맞게 해방합니다 <br> 아직 구현을 않했슴돠 :)</div>
+                <div class="foot_head">** 딸깍 해방 이란? **</div>
+                <div class="foot_content"> 추옵 -> 1추 보공<br> 잠재능력 -> 직업에 맞게 보보공 or 보보마<br> 에디셔널 잠재능력 -> 직업에 맞게 공격력 or
+                    마력 30퍼<br> 세트 옵션 변경사항 또한 현 아이템 상황에 맞게 변경됩니다! </div>
             </div>
         </div>
         <div class="third_wrap_div">
-            <form class="btn_form" method="post">
-                <input type="hidden" name="id" th:value="${id}"/>
-                <button class="btn" type="button">디테일 해방</button>
-            </form>
+            <form class="btn_form" th:action="@{/simpleLiberate}" method="post">
+                <input type="hidden" name="id" th:value="${id}" />
+                <button class="btn" type="submit">딸깍 해방</button> </form>
         </div>
-        <div class="third_wrap_div">
-        <form class="btn_form" th:action="@{/mapleLiberation}" method="get">
-            <button class="btn"  type="submit">캐릭 다시 선택</button>
-        </form>
-        </div>
-
     </div>
 </div>
 <div class="footer_wrap">
