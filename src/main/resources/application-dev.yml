@@ -1,6 +1,6 @@
 #개발환경 환경설정
 server:
-  port: 7070
+  port: 80
 spring:
   thymeleaf:
     prefix: classpath:/templates/
